@@ -1,12 +1,17 @@
 .navbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   background-color: #333;
-  padding: 1rem;
+  padding: 0;
+  margin: 0;
   width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
-
+.logo-image {
+  width: 2rem;
+}
 .logo {
   text-decoration: none;
   color: white;

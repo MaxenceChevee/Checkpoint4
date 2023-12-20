@@ -1,4 +1,15 @@
-body {
+body,
+html {
   margin: 0;
+  padding: 0;
+  height: 100%;
   font-family: "Arial", sans-serif;
+}
+
+body {
+  background-image: url("../assets/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100%;
 }

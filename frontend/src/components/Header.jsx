@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/Header.scss";
+import logoImage from "../assets/roulette.png";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -8,9 +9,13 @@ function Header() {
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
-
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
   return (
     <header className={`navbar ${menuOpen ? "menu-open" : ""}`}>
+      <img src={logoImage} alt="Logo" className="logo-image" />
+      <h1>RollRich</h1>
       <Link to="/" className="logo-desktop">
         Accueil
       </Link>
@@ -30,7 +35,7 @@ function Header() {
       </button>
 
       <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-        <Link to="/" className="logo">
+        <Link to="/" className="logo" onClick={closeMenu}>
           Accueil
         </Link>
         <Link to="/connexion" className="logo" onClick={toggleMenu}>
