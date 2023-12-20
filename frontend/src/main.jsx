@@ -6,7 +6,7 @@ import Games from "./pages/Games";
 import App from "./App";
 import Home from "./pages/Home";
 import Connexion from "./pages/Connexion";
-import Contact from "./pages/Contact";
+import About from "./pages/About";
 import Inscription from "./pages/Inscription";
 import "./styles/Global.scss";
 
@@ -20,7 +20,7 @@ root.render(
           <Route index element={<Home />} />
           <Route path="games" element={<Games />} />
           <Route path="connexion" element={<Connexion />} />
-          <Route path="contact" element={<Contact />} />
+          <Route path="contact" element={<About />} />
           <Route path="inscription" element={<Inscription />} />
         </Route>
       </Routes>

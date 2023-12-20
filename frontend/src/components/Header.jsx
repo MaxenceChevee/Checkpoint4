@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/Header.scss";
-import logoImage from "../assets/roulette.png";
+import logoImage from "../assets/Roll1.png";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -14,8 +14,10 @@ function Header() {
   };
   return (
     <header className={`navbar ${menuOpen ? "menu-open" : ""}`}>
-      <img src={logoImage} alt="Logo" className="logo-image" />
-      <h1>RollRich</h1>
+      <button type="button" className="menu-button" onClick={toggleMenu}>
+        ☰
+      </button>
+      <h1 className="game-name">RollRich</h1>
       <Link to="/" className="logo-desktop">
         Accueil
       </Link>
@@ -24,15 +26,14 @@ function Header() {
       </Link>
 
       <Link to="/contact" className="logo-desktop" onClick={toggleMenu}>
-        Contact
+        A propos
       </Link>
 
       <Link to="/inscription" className="logo-desktop" onClick={toggleMenu}>
         Inscription
       </Link>
-      <button type="button" className="menu-button" onClick={toggleMenu}>
-        ☰
-      </button>
+
+      <img src={logoImage} alt="Logo" className="logo-image" />
 
       <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
         <Link to="/" className="logo" onClick={closeMenu}>
@@ -43,7 +44,7 @@ function Header() {
         </Link>
 
         <Link to="/contact" className="logo" onClick={toggleMenu}>
-          Contact
+          A propos
         </Link>
 
         <Link to="/inscription" className="logo" onClick={toggleMenu}>

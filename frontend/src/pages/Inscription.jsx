@@ -6,6 +6,7 @@ const Inscription = () => {
   const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
+  const [dateNaissance, setDateNaissance] = useState("");
 
   const handleInscription = (e) => {
     e.preventDefault();
@@ -26,6 +27,7 @@ const Inscription = () => {
             id="nom"
             value={nom}
             onChange={(e) => setNom(e.target.value)}
+            placeholder="Dupont"
           />
         </div>
         <div>
@@ -35,6 +37,7 @@ const Inscription = () => {
             id="prenom"
             value={prenom}
             onChange={(e) => setPrenom(e.target.value)}
+            placeholder="Antoine"
           />
         </div>
         <div>
@@ -44,6 +47,7 @@ const Inscription = () => {
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="exemple@email.com"
           />
         </div>
         <div>
@@ -53,6 +57,17 @@ const Inscription = () => {
             id="motDePasse"
             value={motDePasse}
             onChange={(e) => setMotDePasse(e.target.value)}
+            placeholder="Au moins 6 caractères"
+          />
+        </div>
+        <div>
+          <label htmlFor="dateNaissance">Date de naissance :</label>
+          <input
+            type="text"
+            id="dateNaissance"
+            value={dateNaissance}
+            onChange={(e) => setDateNaissance(e.target.value)}
+            placeholder="JJ/MM/AAAA"
           />
         </div>
         <button className="button-register" type="submit">

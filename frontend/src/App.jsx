@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
+import "./styles/Global.scss";
 
 function App() {
   return (
-    <div>
+    <div className="all">
       <Header />
-      <h1>App</h1>
       <Outlet />
     </div>
   );
