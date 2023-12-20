@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Connexion from "./pages/Connexion";
 import Contact from "./pages/Contact";
 import Inscription from "./pages/Inscription";
+import "./styles/Global.scss";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

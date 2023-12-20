@@ -3,8 +3,8 @@
   justify-content: space-between;
   align-items: center;
   background-color: #333;
-  padding: 10px;
-  color: red;
+  padding: 1rem;
+  width: 100%;
 }
 
 .logo {
@@ -26,14 +26,11 @@
   font-size: 18px;
   transition: color 0.3s ease;
 }
-.logo:hover {
-  color: #ffd700;
-}
 
 .menu-button {
   display: none;
   font-size: 20px;
-  background: none;
+  background: none !important;
   border: none;
   cursor: pointer;
   color: white;

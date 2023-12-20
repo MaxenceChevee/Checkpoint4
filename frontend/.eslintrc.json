@@ -33,6 +33,7 @@
       {
         "assert": "either"
       }
-    ]
+    ],
+    "react/function-component-definition": "off"
   }
 }
