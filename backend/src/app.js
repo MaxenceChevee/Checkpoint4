@@ -54,7 +54,7 @@ app.use(
 
 // Uncomment one or more of these options depending on the format of the data sent by your client:
 
-// app.use(express.json());
+app.use(express.json());
 // app.use(express.urlencoded());
 // app.use(express.text());
 // app.use(express.raw());
@@ -107,7 +107,6 @@ app.use("/api", router);
 // 1. Uncomment the lines related to serving static files and redirecting unhandled requests.
 // 2. Ensure that the `reactBuildPath` points to the correct directory where your frontend's build artifacts are located.
 
-/*
 const reactBuildPath = `${__dirname}/../../frontend/dist`;
 
 // Serve react resources
@@ -119,7 +118,6 @@ app.use(express.static(reactBuildPath));
 app.get("*", (req, res) => {
   res.sendFile(`${reactBuildPath}/index.html`);
 });
-*/
 
 /* ************************************************************************* */
 
