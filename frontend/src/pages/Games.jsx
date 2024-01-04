@@ -5,7 +5,7 @@ import GameStatus from "../components/GameStatus";
 function Games() {
   return (
     <div>
-      <h2>Jeux de cartes</h2>
+      <h2>BLACKJACK</h2>
       <Link to="/">
         <button type="button">Retour à la page d'accueil</button>
       </Link>

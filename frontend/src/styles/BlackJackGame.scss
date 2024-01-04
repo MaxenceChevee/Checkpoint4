@@ -33,3 +33,15 @@
     transform: translateX(0);
   }
 }
+.deck {
+  background-color: #000;
+  position: relative;
+  width: 100px;
+  height: 150px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  margin: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
