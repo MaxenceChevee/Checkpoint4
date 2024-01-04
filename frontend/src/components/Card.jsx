@@ -1,4 +1,3 @@
-// Card.jsx
 import React from "react";
 import PropTypes from "prop-types";
 import "../styles/Card.scss";
@@ -46,9 +45,15 @@ const Card = ({ rank, suit, isFaceUp }) => {
 };
 
 Card.propTypes = {
-  rank: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  suit: PropTypes.oneOf(["hearts", "diamonds", "clubs", "spades"]).isRequired,
-  isFaceUp: PropTypes.bool.isRequired,
+  rank: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  suit: PropTypes.oneOf(["hearts", "diamonds", "clubs", "spades"]),
+  isFaceUp: PropTypes.bool,
+};
+
+Card.defaultProps = {
+  rank: "",
+  suit: null,
+  isFaceUp: false,
 };
 
 export default Card;
