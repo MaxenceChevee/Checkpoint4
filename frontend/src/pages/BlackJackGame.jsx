@@ -135,7 +135,7 @@ const BlackjackGame = () => {
     const betAmount = parseInt(inputValue, 10);
 
     if (betAmount > wallet) {
-      setMessage("Insufficient funds to bet that amount.");
+      setMessage("Tu n'as pas assez de crédits");
     } else if (betAmount % 1 !== 0) {
       setMessage("Please bet whole numbers only.");
     } else {
@@ -213,13 +213,13 @@ const BlackjackGame = () => {
         let newMessage;
 
         if (winner === "dealer") {
-          newMessage = "Dealer wins...";
+          newMessage = "Le Dealer gagne...";
         } else if (winner === "player") {
           newWallet += currentBet * 2;
-          newMessage = "You win!";
+          newMessage = "Tu gagnes!";
         } else {
           newWallet += currentBet;
-          newMessage = "Push.";
+          newMessage = "Egalité";
         }
 
         setDeck(updatedDeck);
@@ -229,7 +229,9 @@ const BlackjackGame = () => {
         setMessage(newMessage);
       }
     } else {
-      setMessage("Game over! Please start a new game.");
+      setMessage(
+        "Partie terminée ! Vous êtes ruiné(e) ! Veuillez démarrer une nouvelle partie."
+      );
     }
   };
 
@@ -273,18 +275,15 @@ const BlackjackGame = () => {
   return (
     <div>
       <div className="buttons">
-        <button type="button" onClick={() => startNewGame()}>
-          New Game
-        </button>
         <button type="button" onClick={() => hit()}>
-          Hit
+          +1 Carte
         </button>
         <button type="button" onClick={() => stand()}>
-          Stand
+          Rester
         </button>
       </div>
 
-      <p>Wallet: ${wallet}</p>
+      <p>Crédits: ${wallet}</p>
       {!currentBet ? (
         <div className="input-bet">
           <form>
@@ -297,7 +296,7 @@ const BlackjackGame = () => {
             />
           </form>
           <button type="button" onClick={() => placeBet()}>
-            Place Bet
+            Pari {inputValue}$
           </button>
         </div>
       ) : null}
@@ -308,17 +307,17 @@ const BlackjackGame = () => {
           </button>
         </div>
       ) : null}
-      <p>Your Hand ({player && player.count})</p>
+      <p>Tes cartes ({player && player.count})</p>
       <div className="card-container">
         {player && renderCards(player.cards)}
       </div>
 
-      <p>Dealer's Hand ({dealer && dealer.count})</p>
+      <p>Cartes du Dealer ({dealer && dealer.count})</p>
       <div className="card-container">
         {dealer && renderCards(dealer.cards)}
       </div>
       <div className="deck">
-        <p>Deck: {deck.length} cards remaining</p>
+        <p>Paquet: {deck.length} Cartes mélangées</p>
       </div>
       <p>{message}</p>
     </div>
