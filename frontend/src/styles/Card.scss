@@ -1,0 +1,106 @@
+.card {
+  position: relative;
+  width: 100px;
+  height: 150px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  margin: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card .top-left,
+.card .top-right,
+.card .bottom-left,
+.card .bottom-right {
+  position: absolute;
+  font-size: 12px;
+}
+
+.card .top-left {
+  top: 5px;
+  left: 5px;
+}
+
+.card .top-right {
+  top: 5px;
+  right: 5px;
+}
+
+.card .bottom-left {
+  bottom: 5px;
+  left: 5px;
+}
+
+.card .bottom-right {
+  bottom: 5px;
+  right: 5px;
+}
+
+.card-rank,
+.card-suit {
+  position: absolute;
+  font-size: 12px;
+  margin: 0;
+}
+
+.♥ {
+  background-image: url("../assets/coeur.png");
+  background-size: cover;
+  color: red;
+}
+
+.♦ {
+  background-image: url("../assets/carreau.png");
+  background-size: cover;
+  color: red;
+}
+
+.♣ {
+  background-image: url("../assets/trefle.png");
+  background-size: cover;
+  color: black;
+}
+
+.♠ {
+  background-image: url("../assets/pique.png");
+  background-size: cover;
+  color: black;
+}
+
+.card.face-down {
+  background-color: transparent;
+  color: transparent;
+  position: relative;
+  border-radius: 8px;
+}
+
+.card.face-down::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../assets/carte-dos.png");
+  background-size: cover;
+  z-index: -1;
+  border-radius: 8px;
+}
+
+.♥.face-down {
+  color: red;
+}
+
+.♦.face-down {
+  color: red;
+}
+
+.♣.face-down {
+  color: black;
+}
+
+.♠.face-down {
+  color: black;
+}

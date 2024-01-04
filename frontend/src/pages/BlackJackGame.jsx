@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Card from "../components/Card";
+import "../styles/BlackJackGame.scss";
 
 const BlackjackGame = () => {
   const [deck, setDeck] = useState([]);
@@ -13,15 +14,18 @@ const BlackjackGame = () => {
 
   const generateDeck = () => {
     const cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"];
-    const suits = ["♦", "♣", "♥", "♠"];
+    const suits = ["hearts", "diamonds", "clubs", "spades"];
     const newDeck = [];
+
     for (let i = 0; i < cards.length; i += 1) {
       for (let j = 0; j < suits.length; j += 1) {
         newDeck.push({ number: cards[i], suit: suits[j] });
       }
     }
+
     return newDeck;
   };
+
   const getRandomCard = (currentDeck) => {
     const updatedDeck = [...currentDeck];
     const randomIndex = Math.floor(Math.random() * updatedDeck.length);
@@ -61,11 +65,20 @@ const BlackjackGame = () => {
     const dealerStartingHand = [dealerCard1.randomCard, {}];
 
     const playerHand = {
-      cards: playerStartingHand,
+      cards: playerStartingHand.map((card) => ({
+        ...card,
+        isFaceUp: true,
+        drawn: false,
+      })),
       count: getCount(playerStartingHand),
     };
+
     const dealerHand = {
-      cards: dealerStartingHand,
+      cards: dealerStartingHand.map((card, index) => ({
+        ...card,
+        isFaceUp: index === 0,
+        drawn: false,
+      })),
       count: getCount(dealerStartingHand),
     };
 
@@ -249,8 +262,10 @@ const BlackjackGame = () => {
     return cards.map((card, index) => (
       <Card
         key={generateKey(card, index)}
-        number={typeof card.number === "number" ? card.number : 0}
-        suit={card.suit || ""}
+        rank={card.number}
+        suit={card.suit}
+        isFaceUp={card.isFaceUp}
+        className={card.drawn ? "drawn-card" : ""}
       />
     ));
   };
@@ -294,19 +309,17 @@ const BlackjackGame = () => {
         </div>
       ) : null}
       <p>Your Hand ({player && player.count})</p>
-      <table className="cards">
-        <tbody>
-          <tr>{player && renderCards(player.cards)}</tr>
-        </tbody>
-      </table>
+      <div className="card-container">
+        {player && renderCards(player.cards)}
+      </div>
 
       <p>Dealer's Hand ({dealer && dealer.count})</p>
-      <table className="cards">
-        <tbody>
-          <tr>{dealer && renderCards(dealer.cards)}</tr>
-        </tbody>
-      </table>
-
+      <div className="card-container">
+        {dealer && renderCards(dealer.cards)}
+      </div>
+      <div className="deck">
+        <p>Deck: {deck.length} cards remaining</p>
+      </div>
       <p>{message}</p>
     </div>
   );
