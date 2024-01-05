@@ -45,9 +45,9 @@ function Header() {
           </Link>
         </>
       ) : (
-        <button type="button" className="logo-desktop" onClick={logout}>
+        <Link to="/" className="logo-desktop" onClick={logout}>
           Déconnexion
-        </button>
+        </Link>
       )}
 
       <Link to="/contact" className="logo-desktop" onClick={toggleMenu}>
@@ -60,8 +60,11 @@ function Header() {
         <Link to="/" className="logo" onClick={closeMenu}>
           Accueil
         </Link>
-
-        {!isLoggedIn ? (
+        {isLoggedIn ? (
+          <Link to="/" className="logo" onClick={logout}>
+            Déconnexion
+          </Link>
+        ) : (
           <>
             <Link to="/connexion" className="logo" onClick={toggleMenu}>
               Connexion
@@ -71,10 +74,6 @@ function Header() {
               Inscription
             </Link>
           </>
-        ) : (
-          <button type="button" className="logo" onClick={logout}>
-            Déconnexion
-          </button>
         )}
 
         <Link to="/contact" className="logo" onClick={toggleMenu}>
