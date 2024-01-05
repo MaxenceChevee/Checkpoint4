@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const AbstractManager = require("./AbstractManager");
 
 class UserManager extends AbstractManager {
@@ -9,14 +10,29 @@ class UserManager extends AbstractManager {
 
   // The C of CRUD - Create operation
   async create(user) {
-    // Execute the SQL INSERT query to add a new user to the "user" table
+    const { firstname, lastname, pseudoname, mail, password } = user;
+
+    // Générer un sel
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Exécuter la requête SQL INSERT pour ajouter un nouvel utilisateur à la table "users"
     const [result] = await this.database.query(
-      `insert into ${this.table} (title) values (?)`,
-      [user.title]
+      `INSERT INTO ${this.table} (firstname, lastname, pseudoname, mail, password) VALUES (?, ?, ?, ?, ?)`,
+      [firstname, lastname, pseudoname, mail, hashedPassword]
     );
 
-    // Return the ID of the newly inserted user
+    // Retourner l'ID du nouvel utilisateur inséré
     return result.insertId;
+  }
+
+  // Ajoutez cette méthode à votre UserManager
+  async getByMail(mail) {
+    const [user] = await this.database.query(
+      `SELECT * FROM ${this.table} WHERE mail = ?`,
+      [mail]
+    );
+    return user[0];
   }
 
   // The Rs of CRUD - Read operations
