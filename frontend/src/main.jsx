@@ -1,7 +1,8 @@
+// main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
-
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
 import Games from "./pages/Games";
 import App from "./App";
 import Home from "./pages/Home";
@@ -14,16 +15,18 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <React.StrictMode>
-    <Router>
-      <Routes>
-        <Route path="/" element={<App />}>
-          <Route index element={<Home />} />
-          <Route path="games" element={<Games />} />
-          <Route path="connexion" element={<Connexion />} />
-          <Route path="contact" element={<About />} />
-          <Route path="inscription" element={<Inscription />} />
-        </Route>
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<App />}>
+            <Route index element={<Home />} />
+            <Route path="games" element={<Games />} />
+            <Route path="connexion" element={<Connexion />} />
+            <Route path="contact" element={<About />} />
+            <Route path="inscription" element={<Inscription />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
   </React.StrictMode>
 );

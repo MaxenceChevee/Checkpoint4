@@ -1,6 +1,8 @@
+// Connexion.jsx
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "../styles/Connexion.scss";
 
 const Connexion = () => {
@@ -10,6 +12,8 @@ const Connexion = () => {
   });
 
   const [loginStatus, setLoginStatus] = useState(null);
+  const { login, isLoggedIn } = useAuth();
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,8 +33,10 @@ const Connexion = () => {
       // Mise à jour du statut de connexion
       setLoginStatus("Connexion réussie");
 
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(response.data);
+      // Connexion réussie, appeler la fonction login du contexte
+      login();
+
+      console.info(response.data);
     } catch (error) {
       console.error("Error during login:", error);
       setLoginStatus("Erreur lors de la connexion");
@@ -42,9 +48,16 @@ const Connexion = () => {
     return (
       <div className="form-container">
         <h2>{loginStatus}</h2>
-        <Link to="/">Retour à l'accueil</Link>
+        <button type="button" onClick={() => navigate("/")}>
+          Retour à l'accueil
+        </button>
       </div>
     );
+  }
+
+  // Si l'utilisateur est déjà connecté, le rediriger
+  if (isLoggedIn) {
+    navigate("/");
   }
 
   // Si la connexion n'est pas encore réussie, affiche le formulaire
