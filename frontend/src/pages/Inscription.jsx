@@ -1,76 +1,107 @@
 import { useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 import "../styles/Inscription.scss";
 
 const Inscription = () => {
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
-  const [email, setEmail] = useState("");
-  const [motDePasse, setMotDePasse] = useState("");
-  const [dateNaissance, setDateNaissance] = useState("");
+  const [user, setUser] = useState({
+    firstname: "",
+    lastname: "",
+    pseudoname: "",
+    mail: "",
+    password: "",
+  });
+  const [registrationStatus, setRegistrationStatus] = useState(null);
 
-  const handleInscription = (e) => {
-    e.preventDefault();
-
-    console.error("Message d'erreur");
-    console.warn("Message d'avertissement");
-    console.info("Message d'information");
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
   };
 
+  const handleInscription = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3310/api/users",
+        user
+      );
+      setRegistrationStatus("Vous êtes bien inscrit");
+      // eslint-disable-next-line no-restricted-syntax
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error during registration:", error);
+      setRegistrationStatus("Erreur lors de l'inscription");
+    }
+  };
+  if (registrationStatus === "Vous êtes bien inscrit") {
+    return (
+      <div className="form-container">
+        <h2>{registrationStatus}</h2>
+        <Link to="/">Retour à l'accueil</Link>
+      </div>
+    );
+  }
   return (
     <div className="form-container">
       <h2>Inscription</h2>
       <form onSubmit={handleInscription}>
         <div>
-          <label htmlFor="nom">Nom :</label>
-          <input
-            type="text"
-            id="nom"
-            value={nom}
-            onChange={(e) => setNom(e.target.value)}
-            placeholder="Dupont"
-          />
+          <label>
+            Firstname:
+            <input
+              type="text"
+              name="firstname"
+              value={user.firstname}
+              onChange={handleInputChange}
+            />
+          </label>
         </div>
         <div>
-          <label htmlFor="prenom">Prénom :</label>
-          <input
-            type="text"
-            id="prenom"
-            value={prenom}
-            onChange={(e) => setPrenom(e.target.value)}
-            placeholder="Antoine"
-          />
+          <label>
+            Lastname:
+            <input
+              type="text"
+              name="lastname"
+              value={user.lastname}
+              onChange={handleInputChange}
+            />
+          </label>
         </div>
         <div>
-          <label htmlFor="email">Email :</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="exemple@email.com"
-          />
+          <label>
+            Pseudoname:
+            <input
+              type="text"
+              name="pseudoname"
+              value={user.pseudoname}
+              onChange={handleInputChange}
+            />
+          </label>
         </div>
         <div>
-          <label htmlFor="motDePasse">Mot de passe :</label>
-          <input
-            type="password"
-            id="motDePasse"
-            value={motDePasse}
-            onChange={(e) => setMotDePasse(e.target.value)}
-            placeholder="Au moins 6 caractères"
-          />
+          <label>
+            Mail:
+            <input
+              type="text"
+              name="mail"
+              value={user.mail}
+              onChange={handleInputChange}
+            />
+          </label>
+
+          <label>
+            Password:
+            <input
+              type="password"
+              name="password"
+              value={user.password}
+              onChange={handleInputChange}
+            />
+          </label>
         </div>
-        <div>
-          <label htmlFor="dateNaissance">Date de naissance :</label>
-          <input
-            type="text"
-            id="dateNaissance"
-            value={dateNaissance}
-            onChange={(e) => setDateNaissance(e.target.value)}
-            placeholder="JJ/MM/AAAA"
-          />
-        </div>
-        <button className="button-register" type="submit">
+        <button type="button" onClick={handleInscription}>
           S'inscrire
         </button>
       </form>

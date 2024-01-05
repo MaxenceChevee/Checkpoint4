@@ -1,5 +1,34 @@
-// Import access to database tables
+const bcrypt = require("bcryptjs");
+
 const tables = require("../tables");
+
+const saltRounds = 10; // Vous pouvez ajuster le nombre selon vos besoins
+
+const login = async (req, res) => {
+  const { mail, password } = req.body;
+
+  try {
+    // Fetch user from the database based on email
+    const user = await tables.users.getByMail(mail);
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Compare the provided password with the stored hashed password
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Respond with successful login and user details
+    return res.status(200).json({ message: "Login successful", user });
+  } catch (error) {
+    console.error("Error during login:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 // The B of BREAD - Browse (Read All) operation
 const browse = async (req, res, next) => {
@@ -78,17 +107,30 @@ const edit = async (req, res) => {
 
 // The A of BREAD - Add (Create) operation
 const add = async (req, res, next) => {
-  // Extract the user data from the request body
-  const user = req.body;
-
   try {
-    // Insert the user into the database
+    // Extrait les données de l'utilisateur du corps de la requête
+    const { firstname, lastname, pseudoname, mail, password } = req.body;
+
+    // Hachez le mot de passe avant de l'insérer dans la base de données
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.info("Stored Password:", hashedPassword);
+
+    // Créez un objet utilisateur à partir des données extraites
+    const user = {
+      firstname,
+      lastname,
+      pseudoname,
+      mail,
+      password, // Utilisez le mot de passe haché
+    };
+
+    // Insérez l'utilisateur dans la base de données
     const insertId = await tables.users.create(user);
 
-    // Respond with HTTP 201 (Created) and the ID of the newly inserted user
+    // Répond avec HTTP 201 (Créé) et l'ID du nouvel utilisateur inséré
     res.status(201).json({ insertId });
   } catch (err) {
-    // Pass any errors to the error-handling middleware
+    // Passez les erreurs à la middleware de gestion des erreurs
     next(err);
   }
 };
@@ -114,4 +156,5 @@ module.exports = {
   edit,
   add,
   destroy,
+  login,
 };
