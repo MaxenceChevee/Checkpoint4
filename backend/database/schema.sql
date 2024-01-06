@@ -7,5 +7,6 @@ CREATE TABLE users (
   pseudoname VARCHAR(30) NOT NULL,
   mail VARCHAR(90),
   password VARCHAR(255),
+  balance INT DEFAULT 1000,
   PRIMARY KEY (`id`)
 );
