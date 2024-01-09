@@ -1,22 +1,49 @@
-import React, { createContext, useContext, useState, useMemo } from "react";
+// AuthContext.js
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  useEffect,
+} from "react";
 import PropTypes from "prop-types";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const login = () => {
-    setLoggedIn(true);
+  useEffect(() => {
+    const jwtToken = localStorage.getItem("token");
+
+    if (jwtToken) {
+      const decodedPayload = jwtDecode(jwtToken);
+      axios
+        .get(`http://localhost:3310/api/users/${decodedPayload.user}`)
+        .then((res) => {
+          setUser(res.data);
+        });
+    }
+  }, []);
+
+  const updateBalance = (newBalance) => {
+    axios
+      .put(`http://localhost:3310/api/users/${user.id}`, {
+        balance: newBalance,
+      })
+      .then((res) => {
+        setUser({ ...user, balance: res.data.user.balance });
+      });
   };
-
   const logout = () => {
-    setLoggedIn(false);
+    localStorage.removeItem("token");
+    setUser(null);
   };
-
   const authContextValue = useMemo(() => {
-    return { isLoggedIn, login, logout };
-  }, [isLoggedIn]);
+    return { user, updateBalance, logout };
+  }, [user, updateBalance, logout]);
 
   return (
     <AuthContext.Provider value={authContextValue}>
@@ -32,7 +59,9 @@ const useAuth = () => {
   }
   return context;
 };
+
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
 export { AuthProvider, useAuth };

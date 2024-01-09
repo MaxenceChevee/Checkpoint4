@@ -1,4 +1,3 @@
-const bcrypt = require("bcryptjs");
 const AbstractManager = require("./AbstractManager");
 
 class UserManager extends AbstractManager {
@@ -12,14 +11,10 @@ class UserManager extends AbstractManager {
   async create(user) {
     const { firstname, lastname, pseudoname, mail, password } = user;
 
-    // Générer un sel
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
     // Exécuter la requête SQL INSERT pour ajouter un nouvel utilisateur à la table "users"
     const [result] = await this.database.query(
       `INSERT INTO ${this.table} (firstname, lastname, pseudoname, mail, password, balance) VALUES (?, ?, ?, ?, ?, ?)`,
-      [firstname, lastname, pseudoname, mail, hashedPassword, 1000]
+      [firstname, lastname, pseudoname, mail, password, 1000]
     );
 
     // Retourner l'ID du nouvel utilisateur inséré

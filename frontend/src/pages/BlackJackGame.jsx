@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Card from "../components/Card";
+import { useAuth } from "../context/AuthContext";
 import "../styles/BlackJackGame.scss";
 
 const BlackjackGame = () => {
+  const { user, updateBalance } = useAuth();
   const [deck, setDeck] = useState([]);
   const [dealer, setDealer] = useState(null);
   const [player, setPlayer] = useState(null);
@@ -119,7 +121,7 @@ const BlackjackGame = () => {
       setDeck(newUpdatedDeck);
       setDealer(newDealer);
       setPlayer(newPlayer);
-      setWallet(100);
+      setWallet(user.balance);
       setInputValue("");
       setCurrentBet(null);
       setGameOver(false);
@@ -141,6 +143,7 @@ const BlackjackGame = () => {
     } else {
       const newWallet = wallet - betAmount;
       setWallet(newWallet);
+      updateBalance(newWallet);
       setInputValue("");
       setCurrentBet(betAmount);
     }

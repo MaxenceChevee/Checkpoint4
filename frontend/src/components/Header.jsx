@@ -7,7 +7,8 @@ import logoImage from "../assets/Roll1.png";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isLoggedIn, logout } = useAuth();
+  const { user, logout } = useAuth();
+
   const location = useLocation();
 
   const toggleMenu = () => {
@@ -22,7 +23,6 @@ function Header() {
   if (location.pathname === "/games") {
     return null;
   }
-
   return (
     <header className={`navbar ${menuOpen ? "menu-open" : ""}`}>
       <button type="button" className="menu-button" onClick={toggleMenu}>
@@ -34,7 +34,7 @@ function Header() {
         Accueil
       </Link>
 
-      {!isLoggedIn ? (
+      {!user ? (
         <>
           <Link to="/connexion" className="logo-desktop" onClick={toggleMenu}>
             Connexion
@@ -45,9 +45,12 @@ function Header() {
           </Link>
         </>
       ) : (
-        <Link to="/" className="logo-desktop" onClick={logout}>
-          Déconnexion
-        </Link>
+        <>
+          <p className="logo-desktop">Crédits: {user.balance}</p>
+          <Link to="/" className="logo-desktop" onClick={logout}>
+            Déconnexion
+          </Link>
+        </>
       )}
 
       <Link to="/contact" className="logo-desktop" onClick={toggleMenu}>
@@ -60,10 +63,13 @@ function Header() {
         <Link to="/" className="logo" onClick={closeMenu}>
           Accueil
         </Link>
-        {isLoggedIn ? (
-          <Link to="/" className="logo" onClick={logout}>
-            Déconnexion
-          </Link>
+        {user ? (
+          <>
+            <p className="logo">Crédits: {user.balance}</p>
+            <Link to="/" className="logo" onClick={logout}>
+              Déconnexion
+            </Link>
+          </>
         ) : (
           <>
             <Link to="/connexion" className="logo" onClick={toggleMenu}>

@@ -27,9 +27,12 @@ const Inscription = () => {
         "http://localhost:3310/api/users",
         user
       );
+
+      const { token } = response.data;
+
+      localStorage.setItem("token", token);
+
       setRegistrationStatus("Vous êtes bien inscrit");
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(response.data);
     } catch (error) {
       console.error("Error during registration:", error);
       setRegistrationStatus("Erreur lors de l'inscription");
