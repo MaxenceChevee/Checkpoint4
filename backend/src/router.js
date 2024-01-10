@@ -13,7 +13,7 @@ router.get("/users", verifyToken, userControllers.browse);
 router.get("/users/:id", userControllers.read);
 router.put("/users/:id", userControllers.edit);
 router.post("/users", userControllers.add);
-router.post("/users/:id/credits", userControllers.updateCredits);
+router.put("/users/:id/credits", verifyToken, userControllers.updateCredits);
 router.delete("/users/:id", userControllers.destroy);
 
 module.exports = router;

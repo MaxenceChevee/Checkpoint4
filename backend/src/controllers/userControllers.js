@@ -31,7 +31,7 @@ const login = async (req, res) => {
     // Respond with successful login, user details, and token
     return res.status(200).json({
       message: "Login successful",
-      user: { ...user, balance: user.balance },
+      user: { ...user, credits: user.credits },
       token,
     });
   } catch (error) {
@@ -39,25 +39,29 @@ const login = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 const updateCredits = async (req, res) => {
   try {
     const { id } = req.params;
     const { credits } = req.body;
 
-    // Mettez à jour les crédits de l'utilisateur dans la base de données
     const updatedUser = await tables.users.updateCredits(id, credits);
 
     res.status(200).json({
       message: "Crédits mis à jour avec succès",
-      user: updatedUser,
+      user: {
+        id: updatedUser.id,
+        credits: updatedUser.credits,
+      },
     });
   } catch (error) {
-    console.error("Erreur lors de la mise à jour des crédits:", error);
+    console.error("Erreur lors de la mise à jour des crédits :", error);
     res
       .status(500)
       .json({ message: "Erreur lors de la mise à jour des crédits" });
   }
 };
+
 // The B of BREAD - Browse (Read All) operation
 const browse = async (req, res, next) => {
   try {
@@ -108,7 +112,7 @@ const edit = async (req, res) => {
         .json({ message: "Le corps de la requête est vide." });
     }
 
-    const { firstname, lastname, mail, password, balance } = req.body;
+    const { firstname, lastname, mail, password, credits } = req.body;
 
     // Edit user information directly using UserManager
     const affectedRows = await tables.users.edit(userId, {
@@ -116,7 +120,7 @@ const edit = async (req, res) => {
       lastname,
       mail,
       password,
-      balance,
+      credits,
     });
 
     if (affectedRows === 0) {

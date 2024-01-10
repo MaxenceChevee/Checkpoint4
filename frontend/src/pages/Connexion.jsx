@@ -1,20 +1,18 @@
 // Connexion.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Connexion.scss";
 
 const Connexion = () => {
-  const { user: isloggedIn } = useAuth();
+  const { user: isLoggedIn } = useAuth();
   const [, setHasLogged] = useState(false);
   const [user, setUser] = useState({
     mail: "",
     password: "",
   });
-
   const [loginStatus, setLoginStatus] = useState(null);
-
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -50,10 +48,12 @@ const Connexion = () => {
     }
   };
 
-  if (isloggedIn) {
-    navigate("/");
-  }
-  // Si la connexion est réussie, affiche le message avec le bouton de redirection
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn, navigate]);
+
   if (loginStatus === "Connexion réussie") {
     return (
       <div className="form-container">
@@ -64,7 +64,6 @@ const Connexion = () => {
       </div>
     );
   }
-
   return (
     <div className="form-container">
       <h2>Connexion</h2>

@@ -1,4 +1,3 @@
-// AuthContext.js
 import React, {
   createContext,
   useContext,
@@ -28,22 +27,56 @@ const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const updateBalance = (newBalance) => {
-    axios
-      .put(`http://localhost:3310/api/users/${user.id}`, {
-        balance: newBalance,
-      })
-      .then((res) => {
-        setUser({ ...user, balance: res.data.user.balance });
-      });
+  // Fonction pour mettre à jour les crédits côté serveur
+  const updateUserCreditsOnServer = async (userId, newCredits) => {
+    try {
+      const jwtToken = localStorage.getItem("token");
+
+      if (!jwtToken || !userId) {
+        console.error("Invalid token or user ID");
+        return;
+      }
+
+      await axios.put(
+        `http://localhost:3310/api/users/${userId}/credits`,
+        { credits: newCredits },
+        { headers: { "x-auth-token": jwtToken } }
+      );
+    } catch (error) {
+      console.error("Error updating credits on server:", error);
+    }
   };
+
+  // Fonction pour mettre à jour les crédits dans le contexte
+  const updateCredits = async (newCredits) => {
+    try {
+      if (!user || !user.id) {
+        console.error("Invalid user");
+        return;
+      }
+
+      // Mettre à jour les crédits côté serveur
+      await updateUserCreditsOnServer(user.id, newCredits);
+
+      // Mettre à jour les crédits dans le contexte
+      setUser((prevUser) => ({
+        ...prevUser,
+        credits: newCredits,
+      }));
+    } catch (error) {
+      console.error("Error updating credits:", error);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
   };
-  const authContextValue = useMemo(() => {
-    return { user, updateBalance, logout };
-  }, [user, updateBalance, logout]);
+
+  const authContextValue = useMemo(
+    () => ({ user, updateCredits, logout }),
+    [user]
+  );
 
   return (
     <AuthContext.Provider value={authContextValue}>
@@ -52,16 +85,18 @@ const AuthProvider = ({ children }) => {
   );
 };
 
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
 const useAuth = () => {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context;
-};
 
-AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+  return context;
 };
 
 export { AuthProvider, useAuth };

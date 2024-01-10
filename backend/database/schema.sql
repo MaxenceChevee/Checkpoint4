@@ -2,11 +2,11 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
   id INT NOT NULL AUTO_INCREMENT,
-  firstname VARCHAR(30) DEFAULT NULL,
-  lastname VARCHAR(30) DEFAULT NULL,
-  pseudoname VARCHAR(30) NOT NULL,
-  mail VARCHAR(90),
+  firstname VARCHAR(255) DEFAULT NULL,
+  lastname VARCHAR(255) DEFAULT NULL,
+  pseudoname VARCHAR(255) NOT NULL,
+  mail VARCHAR(255),
   password VARCHAR(255),
-  balance INT DEFAULT 1000,
+  credits INT DEFAULT 1000,
   PRIMARY KEY (`id`)
 );

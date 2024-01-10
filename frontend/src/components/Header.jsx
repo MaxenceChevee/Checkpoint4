@@ -46,7 +46,8 @@ function Header() {
         </>
       ) : (
         <>
-          <p className="logo-desktop">Crédits: {user.balance}</p>
+          <p className="logo-desktop">Crédits: {user && user.credits}</p>
+
           <Link to="/" className="logo-desktop" onClick={logout}>
             Déconnexion
           </Link>
@@ -65,7 +66,7 @@ function Header() {
         </Link>
         {user ? (
           <>
-            <p className="logo">Crédits: {user.balance}</p>
+            <p className="logo">Crédits: {user.credits}</p>
             <Link to="/" className="logo" onClick={logout}>
               Déconnexion
             </Link>

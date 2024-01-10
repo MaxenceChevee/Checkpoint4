@@ -21,7 +21,7 @@ const seed = async () => {
     // Generating USERS columns
     queries.push(
       database.query(
-        `INSERT INTO users (firstname, lastname, pseudoname, mail, password, balance) VALUES
+        `INSERT INTO users (firstname, lastname, pseudoname, mail, password, credits) VALUES
          ('Admin', 'istrator', 'Administrator', 'administrator@email.com', 'admin', 1000),
          ('Mode', 'rator', 'Moderator', 'moderator@email.com', 'rator', 1000),
          ('Use', 'R', 'User', 'user@email.com', 'user', 1000),
