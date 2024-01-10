@@ -1,18 +1,18 @@
 // Connexion.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Connexion.scss";
 
 const Connexion = () => {
+  const { user: isLoggedIn } = useAuth();
+  const [, setHasLogged] = useState(false);
   const [user, setUser] = useState({
     mail: "",
     password: "",
   });
-
   const [loginStatus, setLoginStatus] = useState(null);
-  const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -30,12 +30,17 @@ const Connexion = () => {
         user
       );
 
+      const { token } = response.data;
+
+      // Stockez le token dans le local storage
+      localStorage.setItem("token", token);
+
       // Mise à jour du statut de connexion
       setLoginStatus("Connexion réussie");
 
-      // Connexion réussie, appeler la fonction login du contexte
-      login();
+      setHasLogged(true);
 
+      // Connexion réussie, appeler la fonction login du contexte
       console.info(response.data);
     } catch (error) {
       console.error("Error during login:", error);
@@ -43,24 +48,22 @@ const Connexion = () => {
     }
   };
 
-  // Si la connexion est réussie, affiche le message avec le bouton de redirection
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn, navigate]);
+
   if (loginStatus === "Connexion réussie") {
     return (
       <div className="form-container">
         <h2>{loginStatus}</h2>
-        <button type="button" onClick={() => navigate("/")}>
+        <button type="button" onClick={() => window.location.reload()}>
           Retour à l'accueil
         </button>
       </div>
     );
   }
-
-  // Si l'utilisateur est déjà connecté, le rediriger
-  if (isLoggedIn) {
-    navigate("/");
-  }
-
-  // Si la connexion n'est pas encore réussie, affiche le formulaire
   return (
     <div className="form-container">
       <h2>Connexion</h2>

@@ -1,6 +1,9 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const tables = require("../tables");
+
+const secretKey = process.env.APP_SECRET;
 
 const saltRounds = 10; // Vous pouvez ajuster le nombre selon vos besoins
 
@@ -19,14 +22,43 @@ const login = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "password fail" });
     }
 
-    // Respond with successful login and user details
-    return res.status(200).json({ message: "Login successful", user });
+    // Generate JWT token with username and credits
+    const token = jwt.sign({ user: user.id }, secretKey);
+
+    // Respond with successful login, user details, and token
+    return res.status(200).json({
+      message: "Login successful",
+      user: { ...user, credits: user.credits },
+      token,
+    });
   } catch (error) {
     console.error("Error during login:", error);
     return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const updateCredits = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { credits } = req.body;
+
+    const updatedUser = await tables.users.updateCredits(id, credits);
+
+    res.status(200).json({
+      message: "Crédits mis à jour avec succès",
+      user: {
+        id: updatedUser.id,
+        credits: updatedUser.credits,
+      },
+    });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour des crédits :", error);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la mise à jour des crédits" });
   }
 };
 
@@ -80,7 +112,7 @@ const edit = async (req, res) => {
         .json({ message: "Le corps de la requête est vide." });
     }
 
-    const { firstname, lastname, mail, password } = req.body;
+    const { firstname, lastname, mail, password, credits } = req.body;
 
     // Edit user information directly using UserManager
     const affectedRows = await tables.users.edit(userId, {
@@ -88,6 +120,7 @@ const edit = async (req, res) => {
       lastname,
       mail,
       password,
+      credits,
     });
 
     if (affectedRows === 0) {
@@ -108,29 +141,25 @@ const edit = async (req, res) => {
 // The A of BREAD - Add (Create) operation
 const add = async (req, res, next) => {
   try {
-    // Extrait les données de l'utilisateur du corps de la requête
     const { firstname, lastname, pseudoname, mail, password } = req.body;
 
-    // Hachez le mot de passe avant de l'insérer dans la base de données
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    console.info("Stored Password:", hashedPassword);
-
-    // Créez un objet utilisateur à partir des données extraites
     const user = {
       firstname,
       lastname,
       pseudoname,
       mail,
-      password, // Utilisez le mot de passe haché
+      password: hashedPassword,
+      credits: 1000,
     };
 
-    // Insérez l'utilisateur dans la base de données
     const insertId = await tables.users.create(user);
 
-    // Répond avec HTTP 201 (Créé) et l'ID du nouvel utilisateur inséré
-    res.status(201).json({ insertId });
+    const token = jwt.sign({ user: user.id }, secretKey);
+
+    res.status(201).json({ insertId, token });
   } catch (err) {
-    // Passez les erreurs à la middleware de gestion des erreurs
+    console.error(err);
     next(err);
   }
 };
@@ -157,4 +186,5 @@ module.exports = {
   add,
   destroy,
   login,
+  updateCredits,
 };

@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from "react";
 import Card from "../components/Card";
+import { useAuth } from "../context/AuthContext";
 import "../styles/BlackJackGame.scss";
 
 const BlackjackGame = () => {
+  const { user, updateCredits } = useAuth();
   const [deck, setDeck] = useState([]);
   const [dealer, setDealer] = useState(null);
   const [player, setPlayer] = useState(null);
-  const [wallet, setWallet] = useState(0);
+  const [wallet, setWallet] = useState(user ? user.credits : 0);
   const [inputValue, setInputValue] = useState("");
   const [currentBet, setCurrentBet] = useState(null);
   const [gameOver, setGameOver] = useState(false);
   const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    // Assurez-vous que 'user' existe avant de mettre à jour 'wallet'
+    if (user) {
+      setWallet(user.credits);
+    }
+  }, [user]);
 
   const generateDeck = () => {
     const cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"];
@@ -33,6 +42,7 @@ const BlackjackGame = () => {
     updatedDeck.splice(randomIndex, 1);
     return { randomCard, updatedDeck };
   };
+
   const getCount = (cards) => {
     const rearranged = [];
     cards.forEach((card) => {
@@ -90,9 +100,28 @@ const BlackjackGame = () => {
   };
 
   const startNewGame = (type) => {
-    if (type === "continue") {
-      if (wallet > 0) {
-        const newDeck = deck.length < 10 ? generateDeck() : deck;
+    // Assurez-vous que 'wallet' existe avant de l'utiliser
+    if (wallet !== null && wallet !== undefined) {
+      if (type === "continue") {
+        if (wallet > 0) {
+          const newDeck = deck.length < 10 ? generateDeck() : deck;
+          const {
+            updatedDeck: newUpdatedDeck,
+            player: newPlayer,
+            dealer: newDealer,
+          } = dealCards(newDeck);
+
+          setDeck(newUpdatedDeck);
+          setDealer(newDealer);
+          setPlayer(newPlayer);
+          setCurrentBet(null);
+          setGameOver(false);
+          setMessage(null);
+        } else {
+          setMessage("Game over! You are broke! Please start a new game.");
+        }
+      } else {
+        const newDeck = generateDeck();
         const {
           updatedDeck: newUpdatedDeck,
           player: newPlayer,
@@ -102,28 +131,15 @@ const BlackjackGame = () => {
         setDeck(newUpdatedDeck);
         setDealer(newDealer);
         setPlayer(newPlayer);
+        setWallet(user.credits);
+        setInputValue("");
         setCurrentBet(null);
         setGameOver(false);
         setMessage(null);
-      } else {
-        setMessage("Game over! You are broke! Please start a new game.");
       }
     } else {
-      const newDeck = generateDeck();
-      const {
-        updatedDeck: newUpdatedDeck,
-        player: newPlayer,
-        dealer: newDealer,
-      } = dealCards(newDeck);
-
-      setDeck(newUpdatedDeck);
-      setDealer(newDealer);
-      setPlayer(newPlayer);
-      setWallet(100);
-      setInputValue("");
-      setCurrentBet(null);
-      setGameOver(false);
-      setMessage(null);
+      // Gérer le cas où 'wallet' est null ou undefined
+      console.error("Wallet is null or undefined");
     }
   };
 
@@ -139,8 +155,7 @@ const BlackjackGame = () => {
     } else if (betAmount % 1 !== 0) {
       setMessage("Please bet whole numbers only.");
     } else {
-      const newWallet = wallet - betAmount;
-      setWallet(newWallet);
+      updateCredits(wallet - betAmount); // Déduire le montant du pari du portefeuille
       setInputValue("");
       setCurrentBet(betAmount);
     }
@@ -179,19 +194,48 @@ const BlackjackGame = () => {
     newDealer.count = getCount(newDealer.cards);
     return { dealer: newDealer, updatedDeck };
   };
+
   const getWinner = (dealerParam, playerParam) => {
+    if (dealerParam.count > 21) {
+      return "player";
+    }
+
+    if (playerParam.count > 21) {
+      return "dealer";
+    }
+
     if (dealerParam.count > playerParam.count) {
       return "dealer";
     }
+
     if (dealerParam.count < playerParam.count) {
       return "player";
     }
-    return "push";
+
+    // En cas d'égalité, vérifier s'il y a une main de blackjack
+    const dealerBlackjack =
+      dealerParam.cards.length === 2 && dealerParam.count === 21;
+    const playerBlackjack =
+      playerParam.cards.length === 2 && playerParam.count === 21;
+
+    if (dealerBlackjack && playerBlackjack) {
+      return "push"; // Égalité avec blackjack
+    }
+
+    if (dealerBlackjack) {
+      return "dealer"; // Dealer a un blackjack
+    }
+
+    if (playerBlackjack) {
+      return "player"; // Joueur a un blackjack
+    }
+
+    return "push"; // Aucun des cas ci-dessus, c'est une égalité normale
   };
-  const stand = () => {
+
+  const stand = async () => {
     if (!gameOver) {
       let updatedDeck = [...deck];
-
       let newDealer = { ...dealer };
       newDealer.cards.pop();
 
@@ -202,31 +246,45 @@ const BlackjackGame = () => {
       }
 
       if (newDealer.count > 21) {
+        const newWallet = wallet + currentBet * 2;
+        await updateCredits(newWallet); // Mettre à jour les crédits côté serveur
+        setWallet(newWallet);
         setDeck(updatedDeck);
         setDealer(newDealer);
-        setWallet(wallet + currentBet * 2);
         setGameOver(true);
         setMessage("Dealer bust! You win!");
       } else {
         const winner = getWinner(newDealer, player);
-        let newWallet = wallet;
-        let newMessage;
 
         if (winner === "dealer") {
-          newMessage = "Le Dealer gagne...";
+          // Le Dealer gagne, aucune mise n'est récupérée
+          updateCredits(wallet).then(() => {
+            setDeck(updatedDeck);
+            setDealer(newDealer);
+            setGameOver(true);
+            setMessage("Le Dealer gagne...");
+          });
         } else if (winner === "player") {
-          newWallet += currentBet * 2;
-          newMessage = "Tu gagnes!";
+          // Le joueur gagne le double de sa mise
+          const newWallet = wallet + currentBet * 2;
+          setWallet(newWallet);
+          updateCredits(newWallet).then(() => {
+            setDeck(updatedDeck);
+            setDealer(newDealer);
+            setGameOver(true);
+            setMessage("Tu gagnes!");
+          });
         } else {
-          newWallet += currentBet;
-          newMessage = "Egalité";
+          // Égalité, le joueur récupère sa mise
+          const newWallet = wallet + currentBet;
+          setWallet(newWallet);
+          updateCredits(newWallet).then(() => {
+            setDeck(updatedDeck);
+            setDealer(newDealer);
+            setGameOver(true);
+            setMessage("Égalité");
+          });
         }
-
-        setDeck(updatedDeck);
-        setDealer(newDealer);
-        setWallet(newWallet);
-        setGameOver(true);
-        setMessage(newMessage);
       }
     } else {
       setMessage(
@@ -256,6 +314,7 @@ const BlackjackGame = () => {
       body.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
   const generateKey = (card, index) => {
     return `${card.number}${card.suit}${index}`;
   };

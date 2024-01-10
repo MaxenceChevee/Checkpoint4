@@ -1,96 +1,94 @@
-const bcrypt = require("bcryptjs");
 const AbstractManager = require("./AbstractManager");
 
 class UserManager extends AbstractManager {
   constructor() {
-    // Call the constructor of the parent class (AbstractManager)
-    // and pass the table name "users" as configuration
     super({ table: "users" });
   }
 
-  // The C of CRUD - Create operation
   async create(user) {
     const { firstname, lastname, pseudoname, mail, password } = user;
 
-    // Générer un sel
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Exécuter la requête SQL INSERT pour ajouter un nouvel utilisateur à la table "users"
     const [result] = await this.database.query(
-      `INSERT INTO ${this.table} (firstname, lastname, pseudoname, mail, password) VALUES (?, ?, ?, ?, ?)`,
-      [firstname, lastname, pseudoname, mail, hashedPassword]
+      `INSERT INTO ${this.table} (firstname, lastname, pseudoname, mail, password, credits) VALUES (?, ?, ?, ?, ?, ?)`,
+      [firstname, lastname, pseudoname, mail, password, 1000]
     );
 
-    // Retourner l'ID du nouvel utilisateur inséré
     return result.insertId;
   }
 
-  // Ajoutez cette méthode à votre UserManager
   async getByMail(mail) {
-    const [user] = await this.database.query(
-      `SELECT * FROM ${this.table} WHERE mail = ?`,
-      [mail]
-    );
-    return user[0];
+    try {
+      const [user] = await this.database.query(
+        `SELECT * FROM ${this.table} WHERE mail = ?`,
+        [mail]
+      );
+
+      return user[0];
+    } catch (error) {
+      console.error("Error fetching user by mail:", error);
+      throw error;
+    }
   }
 
-  // The Rs of CRUD - Read operations
   async read(id, field) {
-    // Si un champ spécifique est demandé, exécutez une requête SQL SELECT pour récupérer uniquement ce champ
     if (field) {
       const [rows] = await this.database.query(
         `SELECT ?? FROM ${this.table} WHERE id = ?`,
         [field, id]
       );
 
-      if (rows.length === 0) {
-        return null; // Utilisateur non trouvé
-      }
-
-      return rows[0][field];
+      return rows.length === 0 ? null : rows[0][field];
     }
 
-    // Sinon, exécutez la requête SQL SELECT pour récupérer l'utilisateur complet
     const [rows] = await this.database.query(
       `SELECT * FROM ${this.table} WHERE id = ?`,
       [id]
     );
 
-    if (rows.length === 0) {
-      return null; // Utilisateur non trouvé
-    }
-
-    return rows[0];
+    return rows.length === 0 ? null : rows[0];
   }
 
   async readAll() {
-    // Execute the SQL SELECT query to retrieve all users from the "user" table
-    const [rows] = await this.database.query(`select * from ${this.table}`);
-
-    // Return the array of users
+    const [rows] = await this.database.query(`SELECT * FROM ${this.table}`);
     return rows;
   }
 
-  // The U of CRUD - Update operation
   async edit(id, user) {
-    // Extract fields from the user object
     const { firstname, lastname, mail, password } = user;
 
-    // Execute the SQL UPDATE query to modify an existing user in the "users" table
     const [result] = await this.database.query(
       `UPDATE ${this.table} SET firstname = ?, lastname = ?, mail = ?, password = ? WHERE id = ?`,
       [firstname, lastname, mail, password, id]
     );
 
-    // Return the number of affected rows (0 if no user was updated)
     return result.affectedRows;
   }
 
-  // The D of CRUD - Delete operation
+  async updateCredits(id, credits) {
+    try {
+      const [result] = await this.database.query(
+        `UPDATE ${this.table} SET credits = ? WHERE id = ?`,
+        [credits, id]
+      );
+
+      if (result.affectedRows === 0) {
+        throw new Error("Invalid credit operation: insufficient credits");
+      }
+
+      const [updatedUser] = await this.database.query(
+        `SELECT * FROM ${this.table} WHERE id = ?`,
+        [id]
+      );
+
+      return updatedUser[0];
+    } catch (error) {
+      console.error("Error updating credits:", error);
+      throw error;
+    }
+  }
+
   async delete(id) {
-    // Execute the SQL DELETE query to remove the user with the specified ID
-    await this.database.query(`delete from ${this.table} where id = ?`, [id]);
+    await this.database.query(`DELETE FROM ${this.table} WHERE id = ?`, [id]);
   }
 }
 
