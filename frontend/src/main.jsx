@@ -10,6 +10,7 @@ import Connexion from "./pages/Connexion";
 import About from "./pages/About";
 import Inscription from "./pages/Inscription";
 import "./styles/Global.scss";
+import BlackJackGame from "./pages/BlackJackGame";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -21,6 +22,8 @@ root.render(
           <Route path="/" element={<App />}>
             <Route index element={<Home />} />
             <Route path="games" element={<Games />} />
+            <Route path="blackjack-game" element={<BlackJackGame />} />
+
             <Route path="connexion" element={<Connexion />} />
             <Route path="contact" element={<About />} />
             <Route path="inscription" element={<Inscription />} />

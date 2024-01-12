@@ -21,6 +21,19 @@ const BlackjackGame = () => {
     }
   }, [user]);
 
+  const getWinnerMessage = (result, amount) => {
+    switch (result) {
+      case "dealer":
+        return `Manqué ! Vous venez de perdre ${amount}$`;
+      case "player":
+        return `Bravo ! Vous avez gagné ${amount}$`;
+      case "push":
+        return `Égalité ! Votre mise de ${amount}$ est remboursée !`;
+      default:
+        return "";
+    }
+  };
+
   const generateDeck = () => {
     const cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"];
     const suits = ["hearts", "diamonds", "clubs", "spades"];
@@ -71,8 +84,8 @@ const BlackjackGame = () => {
     const dealerCard1 = getRandomCard(playerCard1.updatedDeck);
     const playerCard2 = getRandomCard(dealerCard1.updatedDeck);
 
-    const playerStartingHand = [playerCard1.randomCard, playerCard2.randomCard];
-    const dealerStartingHand = [dealerCard1.randomCard, {}];
+    const playerStartingHand = [playerCard1.randomCard];
+    const dealerStartingHand = [dealerCard1.randomCard, { hidden: true }];
 
     const playerHand = {
       cards: playerStartingHand.map((card) => ({
@@ -161,30 +174,6 @@ const BlackjackGame = () => {
     }
   };
 
-  const hit = () => {
-    if (!gameOver) {
-      if (currentBet) {
-        const { randomCard, updatedDeck } = getRandomCard(deck);
-        const newPlayer = { ...player };
-        newPlayer.cards.push(randomCard);
-        newPlayer.count = getCount(newPlayer.cards);
-
-        if (newPlayer.count > 21) {
-          setPlayer(newPlayer);
-          setGameOver(true);
-          setMessage("BUST!");
-        } else {
-          setDeck(updatedDeck);
-          setPlayer(newPlayer);
-        }
-      } else {
-        setMessage("Please place a bet.");
-      }
-    } else {
-      setMessage("Game over! Please start a new game.");
-    }
-  };
-
   const dealerDraw = (currentDealer, currentDeck) => {
     const { randomCard, updatedDeck } = getRandomCard(currentDeck);
 
@@ -247,42 +236,45 @@ const BlackjackGame = () => {
 
       if (newDealer.count > 21) {
         const newWallet = wallet + currentBet * 2;
-        await updateCredits(newWallet); // Mettre à jour les crédits côté serveur
+        await updateCredits(newWallet);
         setWallet(newWallet);
         setDeck(updatedDeck);
         setDealer(newDealer);
         setGameOver(true);
-        setMessage("Dealer bust! You win!");
+        setMessage(`Le croupier dépasse 21 ! Vous gagnez ${currentBet * 2}$`);
       } else {
         const winner = getWinner(newDealer, player);
 
         if (winner === "dealer") {
           // Le Dealer gagne, aucune mise n'est récupérée
+          const lostAmount = currentBet;
           updateCredits(wallet).then(() => {
             setDeck(updatedDeck);
             setDealer(newDealer);
             setGameOver(true);
-            setMessage("Le Dealer gagne...");
+            setMessage(getWinnerMessage(winner, lostAmount));
           });
         } else if (winner === "player") {
-          // Le joueur gagne le double de sa mise
-          const newWallet = wallet + currentBet * 2;
+          // Le joueur gagne la mise (2:1 pour un blackjack naturel)
+          const winnings = currentBet * (player.cards.length === 2 ? 2.5 : 2);
+          const newWallet = wallet + winnings;
           setWallet(newWallet);
           updateCredits(newWallet).then(() => {
             setDeck(updatedDeck);
             setDealer(newDealer);
             setGameOver(true);
-            setMessage("Tu gagnes!");
+            setMessage(`BLACKJACK !!!!! Vous remportez ${winnings}$`);
           });
         } else {
           // Égalité, le joueur récupère sa mise
-          const newWallet = wallet + currentBet;
+          const refund = currentBet;
+          const newWallet = wallet + refund;
           setWallet(newWallet);
           updateCredits(newWallet).then(() => {
             setDeck(updatedDeck);
             setDealer(newDealer);
             setGameOver(true);
-            setMessage("Égalité");
+            setMessage(getWinnerMessage(winner, refund));
           });
         }
       }
@@ -290,6 +282,40 @@ const BlackjackGame = () => {
       setMessage(
         "Partie terminée ! Vous êtes ruiné(e) ! Veuillez démarrer une nouvelle partie."
       );
+    }
+  };
+  const hit = () => {
+    if (!gameOver) {
+      if (currentBet) {
+        const { randomCard, updatedDeck } = getRandomCard(deck);
+        const newPlayer = { ...player };
+        newPlayer.cards.push(randomCard);
+        newPlayer.count = getCount(newPlayer.cards);
+
+        if (newPlayer.count === 21) {
+          // Player hits exactly 21
+          const winnings = currentBet * 2.5;
+          const newWallet = wallet + winnings;
+          setWallet(newWallet);
+          updateCredits(newWallet).then(() => {
+            setDeck(updatedDeck);
+            setPlayer(newPlayer);
+            setGameOver(true);
+            setMessage(`BLACKJACK !!!! Vous remportez ${winnings}$`);
+          });
+        } else if (newPlayer.count > 21) {
+          setPlayer(newPlayer);
+          setGameOver(true);
+          setMessage(`Vous avez dépassé 21, vous perdez ${currentBet}$`);
+        } else {
+          setDeck(updatedDeck);
+          setPlayer(newPlayer);
+        }
+      } else {
+        setMessage("Please place a bet.");
+      }
+    } else {
+      setMessage("Game over! Please start a new game.");
     }
   };
 
@@ -325,7 +351,7 @@ const BlackjackGame = () => {
         key={generateKey(card, index)}
         rank={card.number}
         suit={card.suit}
-        isFaceUp={card.isFaceUp}
+        isFaceUp={index === 0 || card.drawn} // Ne montrer qu'une seule carte du joueur avant la mise
         className={card.drawn ? "drawn-card" : ""}
       />
     ));
@@ -343,7 +369,9 @@ const BlackjackGame = () => {
       </div>
 
       <p>Crédits: ${wallet}</p>
-      {!currentBet ? (
+      {currentBet ? (
+        <p>Mise actuelle: ${currentBet}</p>
+      ) : (
         <div className="input-bet">
           <form>
             <input
@@ -358,7 +386,7 @@ const BlackjackGame = () => {
             Pari {inputValue}$
           </button>
         </div>
-      ) : null}
+      )}
       {gameOver ? (
         <div className="buttons">
           <button type="button" onClick={() => startNewGame("continue")}>
