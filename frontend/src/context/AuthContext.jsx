@@ -13,21 +13,32 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const jwtToken = localStorage.getItem("token");
+    const fetchData = async () => {
+      const jwtToken = localStorage.getItem("token");
 
-    if (jwtToken) {
-      const decodedPayload = jwtDecode(jwtToken);
-      axios
-        .get(`http://localhost:3310/api/users/${decodedPayload.user}`)
-        .then((res) => {
+      if (jwtToken) {
+        try {
+          const decodedPayload = jwtDecode(jwtToken);
+          const res = await axios.get(
+            `http://localhost:3310/api/users/${decodedPayload.user}`
+          );
           setUser(res.data);
-        });
-    }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  // Fonction pour mettre à jour les crédits côté serveur
   const updateUserCreditsOnServer = async (userId, newCredits) => {
     try {
       const jwtToken = localStorage.getItem("token");
@@ -47,18 +58,20 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Fonction pour mettre à jour les crédits dans le contexte
   const updateCredits = async (newCredits) => {
     try {
-      if (!user || !user.id) {
-        console.error("Invalid user");
+      if (
+        !user ||
+        !user.id ||
+        user.credits === null ||
+        user.credits === undefined
+      ) {
+        console.error("Invalid user or user credits");
         return;
       }
 
-      // Mettre à jour les crédits côté serveur
       await updateUserCreditsOnServer(user.id, newCredits);
 
-      // Mettre à jour les crédits dans le contexte
       setUser((prevUser) => ({
         ...prevUser,
         credits: newCredits,
@@ -77,6 +90,10 @@ const AuthProvider = ({ children }) => {
     () => ({ user, updateCredits, logout }),
     [user]
   );
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <AuthContext.Provider value={authContextValue}>

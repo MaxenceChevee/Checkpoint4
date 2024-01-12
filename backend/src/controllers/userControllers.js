@@ -5,7 +5,7 @@ const tables = require("../tables");
 
 const secretKey = process.env.APP_SECRET;
 
-const saltRounds = 10; // Vous pouvez ajuster le nombre selon vos besoins
+const saltRounds = 10;
 
 const login = async (req, res) => {
   const { mail, password } = req.body;

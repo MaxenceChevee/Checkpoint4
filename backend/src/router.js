@@ -1,4 +1,3 @@
-// routes.js
 const express = require("express");
 
 const verifyToken = require("./controllers/verifyToken");
@@ -6,7 +5,6 @@ const verifyToken = require("./controllers/verifyToken");
 const router = express.Router();
 const userControllers = require("./controllers/userControllers");
 
-// Routes publiques
 router.post("/login", userControllers.login);
 
 router.get("/users", verifyToken, userControllers.browse);
