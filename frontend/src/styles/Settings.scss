@@ -1,0 +1,66 @@
+.settings-container {
+  max-width: 400px;
+  margin: 0 auto;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .settings-list-container {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      margin-bottom: 10px;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+
+      input {
+        padding: 8px;
+        font-size: 14px;
+      }
+    }
+
+    button {
+      padding: 10px;
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+  }
+
+  .error-input {
+    border: 1px solid red;
+  }
+
+  .error-input-firstname {
+    border: 1px solid red;
+  }
+
+  .error-input-lastname {
+    border: 1px solid red;
+  }
+
+  .error-input-pseudoname {
+    border: 1px solid red;
+  }
+
+  .error-input-newPassword {
+    border: 1px solid red;
+  }
+
+  .error-input-confirmNewPassword {
+    border: 1px solid red;
+  }
+
+  p {
+    margin-top: 10px;
+    color: red;
+  }
+}
