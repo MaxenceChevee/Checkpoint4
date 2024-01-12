@@ -12,6 +12,7 @@ const Inscription = () => {
     password: "",
   });
   const [registrationStatus, setRegistrationStatus] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,12 +24,29 @@ const Inscription = () => {
 
   const handleInscription = async () => {
     try {
-      await axios.post("http://localhost:3310/api/users", user);
+      const response = await axios.post(
+        "http://localhost:3310/api/users",
+        user
+      );
+
+      const { token } = response.data;
+
+      localStorage.setItem("token", token);
 
       setRegistrationStatus("Vous êtes bien inscrit");
     } catch (error) {
       console.error("Error during registration:", error);
-      setRegistrationStatus("Erreur lors de l'inscription");
+
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.message ===
+          "Cette adresse e-mail est déjà enregistrée."
+      ) {
+        setErrorMessage("Adresse e-mail déjà enregistrée.");
+      } else {
+        setErrorMessage("Erreur lors de l'inscription");
+      }
     }
   };
 
@@ -40,10 +58,10 @@ const Inscription = () => {
       </div>
     );
   }
-
   return (
     <div className="form-container">
       <h2>Inscription</h2>
+      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
       <form onSubmit={handleInscription}>
         <div>
           <label>

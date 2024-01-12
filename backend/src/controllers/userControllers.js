@@ -143,6 +143,13 @@ const add = async (req, res, next) => {
   try {
     const { firstname, lastname, pseudoname, mail, password } = req.body;
 
+    const existingUser = await tables.users.getByMail(mail);
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "Cette adresse e-mail est déjà enregistrée." });
+    }
+
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const user = {
       firstname,
@@ -158,9 +165,10 @@ const add = async (req, res, next) => {
     const token = jwt.sign({ user: user.id }, secretKey);
 
     res.status(201).json({ insertId, token });
+    return insertId;
   } catch (err) {
     console.error(err);
-    next(err);
+    return next(err);
   }
 };
 
