@@ -23,14 +23,7 @@ const Inscription = () => {
 
   const handleInscription = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:3310/api/users",
-        user
-      );
-
-      const { token } = response.data;
-
-      localStorage.setItem("token", token);
+      await axios.post("http://localhost:3310/api/users", user);
 
       setRegistrationStatus("Vous êtes bien inscrit");
     } catch (error) {
@@ -38,6 +31,7 @@ const Inscription = () => {
       setRegistrationStatus("Erreur lors de l'inscription");
     }
   };
+
   if (registrationStatus === "Vous êtes bien inscrit") {
     return (
       <div className="form-container">
@@ -46,6 +40,7 @@ const Inscription = () => {
       </div>
     );
   }
+
   return (
     <div className="form-container">
       <h2>Inscription</h2>

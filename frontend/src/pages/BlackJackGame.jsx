@@ -15,7 +15,6 @@ const BlackjackGame = () => {
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    // Assurez-vous que 'user' existe avant de mettre à jour 'wallet'
     if (user) {
       setWallet(user.credits);
     }
@@ -113,7 +112,6 @@ const BlackjackGame = () => {
   };
 
   const startNewGame = (type) => {
-    // Assurez-vous que 'wallet' existe avant de l'utiliser
     if (wallet !== null && wallet !== undefined) {
       if (type === "continue") {
         if (wallet > 0) {
@@ -151,7 +149,6 @@ const BlackjackGame = () => {
         setMessage(null);
       }
     } else {
-      // Gérer le cas où 'wallet' est null ou undefined
       console.error("Wallet is null or undefined");
     }
   };
@@ -168,7 +165,7 @@ const BlackjackGame = () => {
     } else if (betAmount % 1 !== 0) {
       setMessage("Please bet whole numbers only.");
     } else {
-      updateCredits(wallet - betAmount); // Déduire le montant du pari du portefeuille
+      updateCredits(wallet - betAmount);
       setInputValue("");
       setCurrentBet(betAmount);
     }
@@ -201,25 +198,24 @@ const BlackjackGame = () => {
       return "player";
     }
 
-    // En cas d'égalité, vérifier s'il y a une main de blackjack
     const dealerBlackjack =
       dealerParam.cards.length === 2 && dealerParam.count === 21;
     const playerBlackjack =
       playerParam.cards.length === 2 && playerParam.count === 21;
 
     if (dealerBlackjack && playerBlackjack) {
-      return "push"; // Égalité avec blackjack
+      return "push";
     }
 
     if (dealerBlackjack) {
-      return "dealer"; // Dealer a un blackjack
+      return "dealer";
     }
 
     if (playerBlackjack) {
-      return "player"; // Joueur a un blackjack
+      return "player";
     }
 
-    return "push"; // Aucun des cas ci-dessus, c'est une égalité normale
+    return "push";
   };
 
   const stand = async () => {
@@ -293,7 +289,6 @@ const BlackjackGame = () => {
         newPlayer.count = getCount(newPlayer.cards);
 
         if (newPlayer.count === 21) {
-          // Player hits exactly 21
           const winnings = currentBet * 2.5;
           const newWallet = wallet + winnings;
           setWallet(newWallet);
@@ -351,7 +346,7 @@ const BlackjackGame = () => {
         key={generateKey(card, index)}
         rank={card.number}
         suit={card.suit}
-        isFaceUp={index === 0 || card.drawn} // Ne montrer qu'une seule carte du joueur avant la mise
+        isFaceUp={index === 0 || card.drawn}
         className={card.drawn ? "drawn-card" : ""}
       />
     ));

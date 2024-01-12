@@ -1,4 +1,3 @@
-// Connexion.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -32,15 +31,12 @@ const Connexion = () => {
 
       const { token } = response.data;
 
-      // Stockez le token dans le local storage
       localStorage.setItem("token", token);
 
-      // Mise à jour du statut de connexion
       setLoginStatus("Connexion réussie");
 
       setHasLogged(true);
 
-      // Connexion réussie, appeler la fonction login du contexte
       console.info(response.data);
     } catch (error) {
       console.error("Error during login:", error);
