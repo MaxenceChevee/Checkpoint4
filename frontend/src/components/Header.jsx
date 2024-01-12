@@ -1,4 +1,3 @@
-// Header.jsx
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -19,10 +18,10 @@ function Header() {
     setMenuOpen(false);
   };
 
-  // Rendre la barre de navigation uniquement si le chemin actuel n'est pas "/games"
   if (location.pathname === "/games") {
     return null;
   }
+
   return (
     <header className={`navbar ${menuOpen ? "menu-open" : ""}`}>
       <button type="button" className="menu-button" onClick={toggleMenu}>
@@ -51,6 +50,10 @@ function Header() {
           <Link to="/" className="logo-desktop" onClick={logout}>
             Déconnexion
           </Link>
+
+          <Link to="/settings" className="logo-desktop" onClick={closeMenu}>
+            Réglages
+          </Link>
         </>
       )}
 
@@ -69,6 +72,9 @@ function Header() {
             <p className="logo">Crédits: {user.credits}</p>
             <Link to="/" className="logo" onClick={logout}>
               Déconnexion
+            </Link>
+            <Link to="/settings" className="logo" onClick={closeMenu}>
+              Réglages
             </Link>
           </>
         ) : (

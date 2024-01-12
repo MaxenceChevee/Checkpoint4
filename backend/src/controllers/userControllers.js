@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+
 const jwt = require("jsonwebtoken");
 
 const tables = require("../tables");
@@ -101,43 +102,84 @@ const read = async (req, res, next) => {
 };
 
 // The E of BREAD - Edit (Update) operation
+
 const edit = async (req, res) => {
   const userId = req.params.id;
 
   try {
-    // Check if req.body is defined
     if (!req.body) {
-      return res
-        .status(400)
-        .json({ message: "Le corps de la requête est vide." });
+      console.error("Empty body");
+      return res.status(400).json({ message: "Empty body" });
     }
 
-    const { firstname, lastname, mail, password, credits } = req.body;
-
-    // Edit user information directly using UserManager
-    const affectedRows = await tables.users.edit(userId, {
+    const {
+      currentPassword,
       firstname,
       lastname,
       mail,
-      password,
-      credits,
-    });
+      newPassword,
+      pseudoname,
+    } = req.body;
 
-    if (affectedRows === 0) {
-      return res.status(500).json({ message: "La mise à jour a échoué" });
+    const user = await tables.users.read(userId);
+
+    if (!user) {
+      console.error("User not found");
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch and return the updated user
+    if (newPassword !== undefined && newPassword.trim() !== "") {
+      const passwordMatch =
+        currentPassword &&
+        user.password &&
+        (await bcrypt.compare(currentPassword.trim(), user.password.trim()));
+
+      if (!passwordMatch) {
+        console.error("Incorrect current password");
+        return res.status(401).json({ message: "Incorrect current password" });
+      }
+    }
+
+    const updatedFields = {};
+
+    if (firstname !== undefined) {
+      updatedFields.firstname = firstname;
+    }
+
+    if (lastname !== undefined) {
+      updatedFields.lastname = lastname;
+    }
+
+    if (pseudoname !== undefined) {
+      updatedFields.pseudoname = pseudoname;
+    }
+
+    if (mail !== undefined) {
+      updatedFields.mail = mail;
+    }
+
+    if (newPassword !== undefined && newPassword.trim() !== "") {
+      updatedFields.password = await bcrypt.hash(
+        newPassword.trim(),
+        saltRounds
+      );
+    }
+
+    const affectedRows = await tables.users.edit(userId, updatedFields);
+
+    if (affectedRows === 0) {
+      console.error("Update fail");
+      return res.status(500).json({ message: "Update fail" });
+    }
+
     const editedUser = await tables.users.read(userId);
-    return res.json({ message: "Mise à jour réussie", user: editedUser });
+
+    return res.json({ message: "Updated", user: editedUser });
   } catch (error) {
-    console.error("Erreur lors de la mise à jour de l'utilisateur", error);
-    return res
-      .status(500)
-      .json({ message: "Erreur lors de la mise à jour de l'utilisateur" });
+    console.error("Error updating user:", error);
+    return res.status(500).json({ message: "Error updating user", error });
   }
 };
-
 // The A of BREAD - Add (Create) operation
 const add = async (req, res, next) => {
   try {

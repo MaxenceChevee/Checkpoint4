@@ -85,15 +85,47 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
   };
+  const editUser = async (updatedFields) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/${user.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(updatedFields),
+        }
+      );
 
-  const authContextValue = useMemo(
-    () => ({ user, updateCredits, logout }),
-    [user]
-  );
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUser((prevUser) => ({
+          ...prevUser,
+          ...updatedUser.user,
+        }));
+        return "User updated successfully";
+      }
+      if (response.status === 400) {
+        console.error("Bad Request:", response.statusText);
+        throw new Error("Bad Request");
+      } else if (response.status === 401) {
+        console.error("Unauthorized:", response.statusText);
+        throw new Error("Unauthorized");
+      } else {
+        console.error("Error updating user:", response.statusText);
+        throw new Error("Error updating user");
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw new Error("An error occurred during user update");
+    }
+  };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  const authContextValue = useMemo(() => {
+    return { user, loading, updateCredits, logout, editUser };
+  }, [user, loading, logout]);
 
   return (
     <AuthContext.Provider value={authContextValue}>
@@ -108,12 +140,10 @@ AuthProvider.propTypes = {
 
 const useAuth = () => {
   const context = useContext(AuthContext);
-
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-
   return context;
 };
 
-export { AuthProvider, useAuth };
+export { AuthContext, AuthProvider, useAuth };

@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Inscription from "./pages/Inscription";
 import "./styles/Global.scss";
 import BlackJackGame from "./pages/BlackJackGame";
+import Settings from "./pages/Settings";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -27,6 +28,7 @@ root.render(
             <Route path="connexion" element={<Connexion />} />
             <Route path="contact" element={<About />} />
             <Route path="inscription" element={<Inscription />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
       </Router>
