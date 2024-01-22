@@ -1,0 +1,25 @@
+.wheel-of-fortune-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+
+  canvas {
+    width: 100%; // Ajustez la largeur en fonction de la taille souhaitée
+    height: 600px; // Ajustez la hauteur en fonction de la taille souhaitée
+    margin: auto !important;
+  }
+
+  .spinning {
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}

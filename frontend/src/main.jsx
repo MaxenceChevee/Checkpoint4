@@ -11,6 +11,7 @@ import Inscription from "./pages/Inscription";
 import "./styles/Global.scss";
 import BlackJackGame from "./pages/BlackJackGame";
 import Settings from "./pages/Settings";
+import Wheelset from "./pages/Wheelset";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -23,7 +24,7 @@ root.render(
             <Route index element={<Home />} />
             <Route path="games" element={<Games />} />
             <Route path="blackjack-game" element={<BlackJackGame />} />
-
+            <Route path="Wheelset" element={<Wheelset />} />
             <Route path="connexion" element={<Connexion />} />
             <Route path="rules" element={<Rules />} />
             <Route path="inscription" element={<Inscription />} />

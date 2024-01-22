@@ -40,7 +40,6 @@ const login = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 const updateCredits = async (req, res) => {
   try {
     const { id } = req.params;
