@@ -13,12 +13,34 @@ const BlackjackGame = () => {
   const [currentBet, setCurrentBet] = useState(null);
   const [gameOver, setGameOver] = useState(false);
   const [message, setMessage] = useState(null);
+  const [betOptions] = useState([20, 50, 100]);
 
   useEffect(() => {
     if (user) {
       setWallet(user.credits);
     }
   }, [user]);
+
+  const handleBetOptionClick = (option) => {
+    setInputValue(option.toString());
+  };
+
+  const handleInputChange = (e) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+  };
+
+  const handleIncrement = () => {
+    const currentValue = parseFloat(inputValue.replace(/[^\d.]/g, "")) || 0;
+    const newValue = (currentValue + 10).toString();
+    setInputValue(newValue);
+  };
+
+  const handleDecrement = () => {
+    const currentValue = parseFloat(inputValue.replace(/[^\d.]/g, "")) || 0;
+    const newValue = Math.max(currentValue - 10, 0).toString();
+    setInputValue(newValue);
+  };
 
   const getWinnerMessage = (result, amount) => {
     switch (result) {
@@ -158,17 +180,19 @@ const BlackjackGame = () => {
   }, []);
 
   const placeBet = () => {
-    const betAmount = parseInt(inputValue, 10);
+    const rawBetAmount = parseFloat(inputValue.replace(/[^\d.]/g, ""));
 
-    if (betAmount > wallet) {
-      setMessage("Tu n'as pas assez de crédits");
-    } else if (betAmount % 1 !== 0) {
-      setMessage("Please bet whole numbers only.");
-    } else {
-      updateCredits(wallet - betAmount);
-      setInputValue("");
-      setCurrentBet(betAmount);
+    if (Number.isNaN(rawBetAmount) || rawBetAmount < 10) {
+      setMessage("La mise minimale est de 10$");
+      return;
     }
+
+    const roundedBetAmount = Math.ceil(rawBetAmount / 10) * 10;
+    const adjustedBetAmount = Math.min(roundedBetAmount, wallet);
+
+    updateCredits(wallet - adjustedBetAmount);
+    setInputValue("");
+    setCurrentBet(adjustedBetAmount);
   };
 
   const dealerDraw = (currentDealer, currentDeck) => {
@@ -314,11 +338,6 @@ const BlackjackGame = () => {
     }
   };
 
-  const inputChange = (e) => {
-    const newInputValue = e.target.value;
-    setInputValue(newInputValue);
-  };
-
   const handleKeyDown = (e) => {
     const enter = 13;
 
@@ -353,30 +372,49 @@ const BlackjackGame = () => {
   };
 
   return (
-    <div>
+    <div className="blackjack-game">
       <div className="buttons">
-        <button type="button" onClick={() => hit()}>
+        <button type="button" onClick={() => hit()} className="action-button">
           +1 Carte
         </button>
-        <button type="button" onClick={() => stand()}>
+        <button type="button" onClick={() => stand()} className="action-button">
           Rester
         </button>
       </div>
 
-      <p>Crédits: ${wallet}</p>
+      <p className="section-title">Crédits: ${wallet}</p>
       {currentBet ? (
-        <p>Mise actuelle: ${currentBet}</p>
+        <p className="section-title">
+          Mise actuelle: <span style={{ color: "red" }}>{currentBet}$</span>
+        </p>
       ) : (
         <div className="input-bet">
-          <form>
+          <div className="bet-options">
+            {betOptions.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => handleBetOptionClick(option)}
+              >
+                {option}$
+              </button>
+            ))}
+          </div>
+          <div className="input-with-arrows">
+            <button type="button" onClick={handleIncrement}>
+              &#9650;
+            </button>
             <input
               type="text"
               name="bet"
-              placeholder=""
+              placeholder="10"
               value={inputValue}
-              onChange={(e) => inputChange(e)}
+              onChange={(e) => handleInputChange(e)}
             />
-          </form>
+            <button type="button" onClick={handleDecrement}>
+              &#9660;
+            </button>
+          </div>
           <button type="button" onClick={() => placeBet()}>
             Pari {inputValue}$
           </button>
@@ -389,19 +427,25 @@ const BlackjackGame = () => {
           </button>
         </div>
       ) : null}
-      <p>Tes cartes ({player && player.count})</p>
+      <p className="section-title">
+        Tes cartes (
+        <span style={{ color: "red" }}>{player && player.count}</span>)
+      </p>
+
       <div className="card-container">
         {player && renderCards(player.cards)}
       </div>
 
-      <p>Cartes du Dealer ({dealer && dealer.count})</p>
+      <p className="section-title">
+        Cartes du Dealer (
+        <span style={{ color: "red" }}>{dealer && dealer.count}</span>)
+      </p>
+
       <div className="card-container">
         {dealer && renderCards(dealer.cards)}
       </div>
-      <div className="deck">
-        <p>Paquet: {deck.length} Cartes mélangées</p>
-      </div>
-      <p>{message}</p>
+
+      <p className="message">{message}</p>
     </div>
   );
 };

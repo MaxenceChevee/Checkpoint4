@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Header.scss";
 import logoImage from "../assets/Roll1.png";
@@ -8,8 +8,6 @@ function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, logout } = useAuth();
 
-  const location = useLocation();
-
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -17,10 +15,6 @@ function Header() {
   const closeMenu = () => {
     setMenuOpen(false);
   };
-
-  if (location.pathname === "/games") {
-    return null;
-  }
 
   return (
     <header className={`navbar ${menuOpen ? "menu-open" : ""}`}>
