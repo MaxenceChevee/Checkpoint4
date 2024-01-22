@@ -26,6 +26,9 @@ function Header() {
       <Link to="/" className="logo-desktop" onClick={closeMenu}>
         Accueil
       </Link>
+      <Link to="/rules" className="logo-desktop" onClick={toggleMenu}>
+        Règles du jeu
+      </Link>
 
       {!user ? (
         <>
@@ -39,21 +42,15 @@ function Header() {
         </>
       ) : (
         <>
-          <p className="logo-desktop">Crédits: {user && user.credits}</p>
-
-          <Link to="/" className="logo-desktop" onClick={logout}>
-            Déconnexion
-          </Link>
-
+          <p className="logo-desktop">Crédits: {user && user.credits}$</p>
           <Link to="/settings" className="logo-desktop" onClick={closeMenu}>
             Réglages
           </Link>
+          <Link to="/" className="logo-desktop" onClick={logout}>
+            Déconnexion
+          </Link>
         </>
       )}
-
-      <Link to="/contact" className="logo-desktop" onClick={toggleMenu}>
-        A propos
-      </Link>
 
       <img src={logoImage} alt="Logo" className="logo-image" />
 
@@ -61,14 +58,19 @@ function Header() {
         <Link to="/" className="logo" onClick={closeMenu}>
           Accueil
         </Link>
+        <Link to="/rules" className="logo" onClick={toggleMenu}>
+          Règles du jeu
+        </Link>
+
         {user ? (
           <>
-            <p className="logo">Crédits: {user.credits}</p>
-            <Link to="/" className="logo" onClick={logout}>
-              Déconnexion
-            </Link>
+            <p className="logo">Crédits: {user.credits}$</p>
+
             <Link to="/settings" className="logo" onClick={closeMenu}>
               Réglages
+            </Link>
+            <Link to="/" className="logo" onClick={logout}>
+              Déconnexion
             </Link>
           </>
         ) : (
@@ -76,16 +78,11 @@ function Header() {
             <Link to="/connexion" className="logo" onClick={toggleMenu}>
               Connexion
             </Link>
-
             <Link to="/inscription" className="logo" onClick={toggleMenu}>
               Inscription
             </Link>
           </>
         )}
-
-        <Link to="/contact" className="logo" onClick={toggleMenu}>
-          A propos
-        </Link>
       </div>
     </header>
   );

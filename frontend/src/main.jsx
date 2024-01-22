@@ -6,7 +6,7 @@ import Games from "./pages/Games";
 import App from "./App";
 import Home from "./pages/Home";
 import Connexion from "./pages/Connexion";
-import About from "./pages/About";
+import Rules from "./pages/Rules";
 import Inscription from "./pages/Inscription";
 import "./styles/Global.scss";
 import BlackJackGame from "./pages/BlackJackGame";
@@ -25,7 +25,7 @@ root.render(
             <Route path="blackjack-game" element={<BlackJackGame />} />
 
             <Route path="connexion" element={<Connexion />} />
-            <Route path="contact" element={<About />} />
+            <Route path="rules" element={<Rules />} />
             <Route path="inscription" element={<Inscription />} />
             <Route path="settings" element={<Settings />} />
           </Route>

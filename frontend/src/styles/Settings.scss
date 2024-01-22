@@ -1,6 +1,9 @@
 .settings-container {
   max-width: 400px;
-  margin: 0 auto;
+  margin: auto;
+  background: linear-gradient(to right, #1a1a1a, #534a15ad);
+  padding: 2rem;
+  border-radius: 6px;
 
   h2 {
     text-align: center;
@@ -16,6 +19,7 @@
       font-size: 14px;
       display: flex;
       flex-direction: column;
+      color: white;
 
       input {
         padding: 8px;

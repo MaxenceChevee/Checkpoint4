@@ -16,7 +16,7 @@ function Games() {
           </button>
         </Link>
 
-        <Link to="/roulette-game" className="game-link">
+        <Link to="/wheelset" className="game-link">
           <img src={roueImage} alt="roue" className="game-image" />
           <button className="game-button casino-animation" type="button">
             Tournez la roue et tentez de gagner des crédits !
