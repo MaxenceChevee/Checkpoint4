@@ -14,6 +14,8 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lastWheelSpinDate, setLastWheelSpinDate] = useState(null);
+  const [hasSpunToday, setHasSpunToday] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -128,7 +130,20 @@ const AuthProvider = ({ children }) => {
   };
 
   const authContextValue = useMemo(() => {
-    return { user, loading, updateCredits, logout, editUser, setUser };
+    return {
+      user,
+      loading,
+      updateCredits,
+      logout,
+      editUser,
+      setUser: (newUser) => {
+        setUser(newUser);
+        setLastWheelSpinDate(newUser ? newUser.last_wheel_spin : null);
+        setHasSpunToday(false);
+      },
+      lastWheelSpinDate,
+      hasSpunToday,
+    };
   }, [user, loading, logout]);
 
   return (

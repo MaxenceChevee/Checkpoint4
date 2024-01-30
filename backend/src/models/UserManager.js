@@ -85,13 +85,20 @@ class UserManager extends AbstractManager {
 
   async updateCredits(id, credits) {
     try {
+      const user = await this.read(id);
+
+      const lastWheelSpin = user.last_wheel_spin;
+      if (lastWheelSpin && new Date() - lastWheelSpin < 24 * 60 * 60 * 1000) {
+        throw new Error("La roue peut être tournée une fois par jour.");
+      }
+
       const [result] = await this.database.query(
-        `UPDATE ${this.table} SET credits = ? WHERE id = ?`,
+        `UPDATE ${this.table} SET credits = ?, last_wheel_spin = CURRENT_TIMESTAMP WHERE id = ?`,
         [credits, id]
       );
 
       if (result.affectedRows === 0) {
-        throw new Error("Invalid credit operation: insufficient credits");
+        throw new Error("Opération de crédit invalide : crédits insuffisants");
       }
 
       const [updatedUser] = await this.database.query(
@@ -101,13 +108,34 @@ class UserManager extends AbstractManager {
 
       return updatedUser[0];
     } catch (error) {
-      console.error("Error updating credits:", error);
+      console.error("Erreur lors de la mise à jour des crédits :", error);
       throw error;
     }
   }
 
   async delete(id) {
     await this.database.query(`DELETE FROM ${this.table} WHERE id = ?`, [id]);
+  }
+
+  async checkWheelSpin(userId) {
+    try {
+      const [user] = await this.database.query(
+        `SELECT last_wheel_spin FROM ${this.table} WHERE id = ?`,
+        [userId]
+      );
+
+      if (!user || !user.last_wheel_spin) {
+        return false;
+      }
+
+      const currentTime = new Date();
+      const lastSpinTime = new Date(user.last_wheel_spin);
+
+      return currentTime - lastSpinTime >= 24 * 60 * 60 * 1000;
+    } catch (error) {
+      console.error("Error checking wheel spin:", error);
+      throw error;
+    }
   }
 }
 

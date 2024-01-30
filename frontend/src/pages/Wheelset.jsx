@@ -1,11 +1,12 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import WheelComponent from "react-wheel-of-prizes";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Wheelset.scss";
 
 const Wheelset = () => {
-  const { user, setIsSpinning, isSpinning, setUser } = useAuth();
+  const { user, setUser } = useAuth();
+  const [isWheelSpinning, setIsWheelSpinning] = useState(false);
   const userRef = useRef(user);
 
   useEffect(() => {
@@ -14,14 +15,6 @@ const Wheelset = () => {
 
   const segments = ["$10", "$100", "$200", "$500", "$1000"];
   const segColors = ["#EE4040", "#F0CF50", "#815CD1", "#3DA5E0", "#34A24F"];
-
-  const startWheelSpin = () => {
-    if (!isSpinning && userRef.current) {
-      setIsSpinning(true);
-    } else {
-      console.warn("User not available. Cannot start spinning.");
-    }
-  };
 
   const updateUserCreditsOnServer = async (userId, newCredits) => {
     try {
@@ -58,24 +51,92 @@ const Wheelset = () => {
         return;
       }
 
+      const currentTime = new Date();
+      const lastSpinTime = new Date(userRef.current.last_wheel_spin);
+
+      // Vérifier si l'utilisateur a déjà tourné la roue aujourd'hui
+      if (currentTime - lastSpinTime < 24 * 60 * 60 * 1000) {
+        console.warn("La roue peut être tournée une fois par jour.");
+        return;
+      }
+
       await updateUserCreditsOnServer(userRef.current.id, newCredits);
 
       setUser((prevUser) => ({
         ...prevUser,
         credits: newCredits,
+        last_wheel_spin: new Date().toISOString(),
       }));
 
-      if (setIsSpinning) {
-        setIsSpinning(false);
-      }
+      setIsWheelSpinning(false);
     } catch (error) {
       console.error("Error updating credits:", error);
     }
   };
 
+  const performWheelSpin = async () => {
+    try {
+      const jwtToken = localStorage.getItem("token");
+
+      if (!jwtToken || !userRef.current) {
+        console.error("Invalid token or user ID");
+        throw new Error("Invalid token or user ID");
+      }
+
+      // Appel à l'API pour faire tourner la roue
+      const response = await axios.post(
+        `http://localhost:3310/api/wheel/spin`,
+        {},
+        { headers: { "x-auth-token": jwtToken } }
+      );
+
+      if (response.status === 200) {
+        // La rotation de la roue a réussi
+        const { winner, newCredits } = response.data;
+
+        return { winner, newCredits };
+      }
+      // La rotation de la roue a échoué
+      console.error("Error spinning the wheel:", response.statusText);
+      throw new Error("Error spinning the wheel");
+    } catch (error) {
+      console.error("Error spinning the wheel:", error);
+      throw new Error("Error spinning the wheel");
+    }
+  };
+
+  const startWheelSpin = async () => {
+    try {
+      const jwtToken = localStorage.getItem("token");
+
+      if (!jwtToken || !user) {
+        console.error("Invalid token or user ID");
+        return;
+      }
+
+      // Appel à l'API pour vérifier si l'utilisateur peut faire tourner la roue
+      const response = await axios.post(
+        `http://localhost:3310/api/users/${user.id}/check-wheel-spin`,
+        {},
+        { headers: { "x-auth-token": jwtToken } }
+      );
+
+      if (response.status === 200 && response.data.canSpin) {
+        // L'utilisateur peut faire tourner la roue, procédez à la rotation
+        setIsWheelSpinning(true);
+        await performWheelSpin();
+        setIsWheelSpinning(false);
+      } else {
+        console.warn("La roue peut être tournée une fois par jour.");
+      }
+    } catch (error) {
+      console.error("Error starting wheel spin:", error);
+    }
+  };
+
   return (
     <div className="wheel-of-fortune-container">
-      <div className={`wheel ${isSpinning ? "spinning" : ""}`}>
+      <div className={`wheel ${isWheelSpinning ? "spinning" : ""}`}>
         <WheelComponent
           segments={segments}
           segColors={segColors}

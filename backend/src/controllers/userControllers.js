@@ -8,28 +8,26 @@ const secretKey = process.env.APP_SECRET;
 
 const saltRounds = 10;
 
+const UserManager = require("../models/UserManager");
+
 const login = async (req, res) => {
   const { mail, password } = req.body;
 
   try {
-    // Fetch user from the database based on email
     const user = await tables.users.getByMail(mail);
 
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Compare the provided password with the stored hashed password
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return res.status(401).json({ message: "password fail" });
     }
 
-    // Generate JWT token with username and credits
     const token = jwt.sign({ user: user.id }, secretKey);
 
-    // Respond with successful login, user details, and token
     return res.status(200).json({
       message: "Login successful",
       user: { ...user, credits: user.credits },
@@ -56,21 +54,16 @@ const updateCredits = async (req, res) => {
     });
   } catch (error) {
     console.error("Erreur lors de la mise à jour des crédits :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la mise à jour des crédits" });
+    res.status(400).json({ message: error.message });
   }
 };
 
 // The B of BREAD - Browse (Read All) operation
 const browse = async (req, res, next) => {
   try {
-    // Fetch all users from the database
     const users = await tables.users.readAll();
-    // Respond with the users in JSON format
     res.json(users);
   } catch (err) {
-    // Pass any errors to the error-handling middleware
     next(err);
   }
 };
@@ -81,21 +74,16 @@ const read = async (req, res, next) => {
     const { id } = req.params;
     const { field } = req.query;
 
-    // Fetch a specific user from the database based on the provided ID
     const user = await tables.users.read(id);
 
-    // If the field parameter is present, respond with the specific field
     if (field && user && user[field]) {
       res.json({ [field]: user[field] });
     } else if (user) {
-      // If the user is not found, respond with HTTP 404 (Not Found)
-      // Otherwise, respond with the user in JSON format
       res.json(user);
     } else {
       res.sendStatus(404);
     }
   } catch (err) {
-    // Pass any errors to the error-handling middleware
     next(err);
   }
 };
@@ -216,18 +204,25 @@ const add = async (req, res, next) => {
 // The D of BREAD - Destroy (Delete) operation
 const destroy = async (req, res, next) => {
   try {
-    // Delete the user from the database
     await tables.users.delete(req.params.id);
 
-    // Respond with HTTP 204 (No Content)
     res.sendStatus(204);
   } catch (err) {
-    // Pass any errors to the error-handling middleware
     next(err);
   }
 };
+const checkWheelSpin = async (req, res) => {
+  const userId = req.params.id;
 
-// Ready to export the controller functions
+  try {
+    const canSpin = await UserManager.checkWheelSpin(userId);
+
+    res.status(200).json({ canSpin });
+  } catch (error) {
+    console.error("Error checking wheel spin:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 module.exports = {
   browse,
   read,
@@ -236,4 +231,5 @@ module.exports = {
   destroy,
   login,
   updateCredits,
+  checkWheelSpin,
 };

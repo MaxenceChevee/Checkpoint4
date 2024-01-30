@@ -1,12 +1,11 @@
-DROP TABLE IF EXISTS users;
-
 CREATE TABLE users (
   id INT NOT NULL AUTO_INCREMENT,
-  firstname VARCHAR(255) DEFAULT NULL,
-  lastname VARCHAR(255) DEFAULT NULL,
+  firstname VARCHAR(255) NOT NULL,
+  lastname VARCHAR(255) NOT NULL,
   pseudoname VARCHAR(255) NOT NULL,
-  mail VARCHAR(255),
-  password VARCHAR(255),
+  mail VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
   credits INT DEFAULT 1000,
-  PRIMARY KEY (`id`)
+  last_wheel_spin TIMESTAMP DEFAULT NULL,
+  PRIMARY KEY (id)
 );
