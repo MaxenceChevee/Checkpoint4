@@ -287,14 +287,49 @@ const add = async (req, res, next) => {
   }
 };
 
-const destroy = async (req, res, next) => {
+const destroy = async (req, res) => {
   try {
-    await tables.users.delete(req.params.id);
+    const userId = req.params.id;
+    const { currentPassword } = req.body;
+
+    if (!currentPassword) {
+      return res.status(400).json({
+        errors: {
+          currentPassword:
+            "Le mot de passe actuel est requis pour la suppression du compte.",
+        },
+      });
+    }
+
+    const user = await tables.users.getById(userId);
+
+    const isCurrentPasswordCorrect = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isCurrentPasswordCorrect) {
+      return res.status(401).json({
+        errors: {
+          currentPassword: "Le mot de passe actuel est incorrect.",
+        },
+      });
+    }
+
+    await tables.users.delete(userId);
 
     res.sendStatus(204);
   } catch (err) {
-    next(err);
+    console.error("Error during account deletion:", err);
+
+    res.status(500).json({
+      errors: {
+        general: "Une erreur s'est produite lors de la suppression du compte.",
+      },
+    });
   }
+
+  return Promise.resolve();
 };
 
 const checkWheelSpin = async (req, res) => {

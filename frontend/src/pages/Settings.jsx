@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import "../styles/Settings.scss";
 
 function Settings() {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -46,13 +46,6 @@ function Settings() {
     setSuccessMessage("");
 
     try {
-      if (formData.newPassword.trim() !== formData.confirmNewPassword.trim()) {
-        setErrors({
-          confirmNewPassword: "Les deux mots de passe ne correspondent pas",
-        });
-        return;
-      }
-
       const response = await axios.put(
         `http://localhost:3310/api/users/${user.id}`,
         {
@@ -72,7 +65,6 @@ function Settings() {
         ...updatedUser,
         currentPassword: "",
         newPassword: "",
-        confirmNewPassword: "",
       }));
 
       setSuccessMessage("Changement validé ✔");
@@ -92,6 +84,45 @@ function Settings() {
           general:
             "Une erreur s'est produite lors de la soumission du formulaire.",
         });
+      }
+    }
+  }
+
+  async function handleDeleteAccount() {
+    setErrors({});
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your account?"
+    );
+
+    if (confirmed) {
+      try {
+        await axios.delete(`http://localhost:3310/api/users/${user.id}`, {
+          data: {
+            currentPassword: formData.currentPassword
+              ? formData.currentPassword.trim()
+              : undefined,
+          },
+        });
+
+        logout();
+      } catch (errorCaught) {
+        console.error("Error during account deletion:", errorCaught);
+
+        if (errorCaught.response && errorCaught.response.data) {
+          const { errors: responseErrors, message } = errorCaught.response.data;
+
+          if (responseErrors) {
+            setErrors(responseErrors);
+          } else if (message) {
+            setErrors({ general: message });
+          }
+        } else {
+          setErrors({
+            general:
+              "Une erreur s'est produite lors de la suppression du compte.",
+          });
+        }
       }
     }
   }
@@ -168,6 +199,9 @@ function Settings() {
         </label>
 
         <button type="submit">Save Changes</button>
+        <button type="button" onClick={handleDeleteAccount}>
+          Delete Account
+        </button>
       </form>
 
       {errors.general && <p style={{ color: "red" }}>{errors.general}</p>}

@@ -16,6 +16,20 @@ class UserManager extends AbstractManager {
     return result.insertId;
   }
 
+  async getById(id) {
+    try {
+      const [user] = await this.database.query(
+        `SELECT * FROM ${this.table} WHERE id = ?`,
+        [id]
+      );
+
+      return user[0];
+    } catch (error) {
+      console.error("Error fetching user by id:", error);
+      throw error;
+    }
+  }
+
   async getByMail(mail) {
     try {
       const [user] = await this.database.query(
