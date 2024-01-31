@@ -18,9 +18,7 @@ const passwordSchema = Joi.string()
 const pseudonameSchema = Joi.string()
   .alphanum()
   .min(3)
-  .message(
-    "Le pseudonyme doit contenir au moins 3 caractères alphanumériques."
-  );
+  .message("Le pseudo doit contenir au moins 3 caractères alphanumériques.");
 
 const emailSchema = Joi.string().email().message("Format d'e-mail invalide.");
 
@@ -39,7 +37,7 @@ const validateUniquePseudoname = async (pseudoname) => {
   );
 
   if (existingUserByPseudoname) {
-    throw new Error("Ce pseudonyme est déjà pris.");
+    throw new Error("Ce pseudo est déjà pris.");
   }
 };
 const login = async (req, res) => {
@@ -163,7 +161,7 @@ const edit = async (req, res) => {
 
     if (pseudoname !== undefined) {
       if (pseudoname.trim() === "") {
-        errors.pseudoname = "Le pseudonyme ne peut pas être vide";
+        errors.pseudoname = "Le pseudo ne peut pas être vide";
       } else if (pseudoname.trim() !== user.pseudoname.trim()) {
         try {
           await validateUniquePseudoname(pseudoname);
@@ -247,7 +245,7 @@ const add = async (req, res, next) => {
       pseudoname
     );
     if (existingUserByPseudoname) {
-      return res.status(400).json({ message: "Ce pseudonyme est déjà pris." });
+      return res.status(400).json({ message: "Ce pseudo est déjà pris." });
     }
 
     await validateEmail(mail);
@@ -341,7 +339,9 @@ const checkWheelSpin = async (req, res) => {
     res.status(200).json({ canSpin });
   } catch (error) {
     console.error("Error checking wheel spin:", error);
-    res.status(400).json({ message: "Roue déjà tournée" });
+    res.status(400).json({
+      message: "Vous avez déjà tourné la roue aujourd'hui, revenez demain!",
+    });
   }
 };
 

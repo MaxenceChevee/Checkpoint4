@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Popup from "../components/Popup";
 import "../styles/Connexion.scss";
@@ -66,7 +66,7 @@ const Connexion = () => {
 
   return (
     <div className="connexion-form-container">
-      <h2>Connexion</h2>
+      <h2>Connectez-vous</h2>
       {errorMessage && (
         <p className="connexion-error-message">{errorMessage}</p>
       )}
@@ -85,7 +85,7 @@ const Connexion = () => {
         </div>
         <div className="connexion-form-label">
           <label>
-            Password:
+            Mot de passe:
             <input
               type="password"
               name="password"
@@ -103,7 +103,12 @@ const Connexion = () => {
           Se connecter
         </button>
       </form>
-
+      <p>
+        Vous n'avez pas de compte ?
+        <Link to="/inscription" className="signup-link">
+          Inscrivez-vous
+        </Link>
+      </p>
       {showPopup && (
         <Popup message="Connexion réussie" onClose={handlePopupClose} />
       )}

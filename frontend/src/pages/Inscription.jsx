@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Popup from "../components/Popup";
 import "../styles/Inscription.scss";
 
@@ -27,7 +27,6 @@ const Inscription = () => {
   };
 
   const handleInscription = async () => {
-    // Vérifier les conditions avant d'envoyer la requête
     if (
       user.firstname.length < 2 ||
       user.lastname.length < 2 ||
@@ -52,7 +51,7 @@ const Inscription = () => {
         message: "Vous êtes bien inscrit",
         onClose: () => {
           setPopupData(null);
-          navigate("/connexion"); // Redirige vers la page de connexion
+          navigate("/connexion");
         },
       });
     } catch (error) {
@@ -81,7 +80,7 @@ const Inscription = () => {
       <form onSubmit={handleInscription}>
         <div>
           <label className="inscription-form-label">
-            Firstname:
+            Prénom:
             <input
               type="text"
               name="firstname"
@@ -93,7 +92,7 @@ const Inscription = () => {
         </div>
         <div>
           <label className="inscription-form-label">
-            Lastname:
+            Nom:
             <input
               type="text"
               name="lastname"
@@ -105,7 +104,7 @@ const Inscription = () => {
         </div>
         <div>
           <label className="inscription-form-label">
-            Pseudoname:
+            Pseudo:
             <input
               type="text"
               name="pseudoname"
@@ -129,7 +128,11 @@ const Inscription = () => {
         </div>
         <div>
           <label className="inscription-form-label">
-            Password:
+            Mot de passe:
+            <p className="password-info">
+              (8 caractères minimum dont 1 majuscule, 1 minuscule, 1 chiffre et
+              1 caractère spécial)
+            </p>
             <input
               type="password"
               name="password"
@@ -141,7 +144,7 @@ const Inscription = () => {
         </div>
         <div>
           <label className="inscription-form-label">
-            Confirm Password:
+            Confirmer le mot de passe:
             <input
               type="password"
               name="confirmPassword"
@@ -159,6 +162,12 @@ const Inscription = () => {
           S'inscrire
         </button>
       </form>
+      <p>
+        Vous avez déja un compte ?
+        <Link to="/inscription" className="signup-link">
+          Connectez-vous
+        </Link>
+      </p>
       {popupData && (
         <Popup message={popupData.message} onClose={popupData.onClose} />
       )}
