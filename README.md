@@ -7,7 +7,14 @@ Bienvenue dans le jeu de blackjack fictif ! Un projet simple et divertissant pou
 - **Blackjack Game:** Jouez au blackjack contre un croupier virtuel.
 - **Roue de la Chance:** Tournez la roue une fois par jour pour gagner des crédits bonus.
 - **Gestion des Crédits:** Suivez votre solde de crédits et misez-les judicieusement.
-- **Technologies Utilisées:** Node.js, Express.js, SQL, React.js, Axios, Sass.
+- **Technologies Utilisées:**
+  - **Node.js et Express.js:** Le serveur est construit avec Node.js et Express.js pour gérer les requêtes et les réponses.
+  - **SQL:** La base de données utilise SQL pour stocker les informations sur les utilisateurs, les crédits, etc.
+  - **React.js:** La partie front-end du jeu est développée avec React.js, offrant une expérience utilisateur interactive.
+  - **Axios:** Axios est utilisé pour effectuer des requêtes HTTP entre le client et le serveur.
+  - **Sass:** Les styles sont gérés avec Sass, offrant une structure CSS plus modulaire et élégante.
+  - **React-Wheel-of-Prizes:** La roue de la chance est implémentée avec la bibliothèque React-Wheel-of-Prizes, offrant une expérience ludique pour gagner des crédits.
+  - **Jsonwebtoken:** Jsonwebtoken est utilisé pour gérer l'authentification et la sécurité du jeu.
 
 ## Installation
 
@@ -31,10 +38,6 @@ Le serveur sera accessible à l'adresse `http://localhost:3310` et le client à 
 
 ![Capture d'écran du jeu](https://i.postimg.cc/nLb8rj6Z/Capture-d-cran-167.png)
 
-## Contribuer
-
-Les contributions sont les bienvenues ! N'hésitez pas à ouvrir des issues ou à soumettre des pull requests.
-
 ## Auteurs
 
-- Votre Nom (@VotreNom)
+- **Maxence Chevée**
