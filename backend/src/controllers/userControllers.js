@@ -164,7 +164,7 @@ const edit = async (req, res) => {
     if (pseudoname !== undefined) {
       if (pseudoname.trim() === "") {
         errors.pseudoname = "Le pseudonyme ne peut pas être vide";
-      } else {
+      } else if (pseudoname.trim() !== user.pseudoname.trim()) {
         try {
           await validateUniquePseudoname(pseudoname);
         } catch (error) {

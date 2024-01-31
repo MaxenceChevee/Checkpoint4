@@ -46,29 +46,36 @@ function Settings() {
     setSuccessMessage("");
 
     try {
-      if (formData.pseudoname.trim() !== user.pseudoname.trim()) {
-        const response = await axios.put(
-          `http://localhost:3310/api/users/${user.id}`,
-          {
-            ...formData,
-            currentPassword: formData.currentPassword.trim(),
-          }
-        );
-
-        const updatedUser = response.data.user;
-
-        setFormData((prevData) => ({
-          ...prevData,
-          ...updatedUser,
-          currentPassword: "",
-          newPassword: "",
-          confirmNewPassword: "",
-        }));
-
-        setSuccessMessage("Changement validé ✔");
-      } else {
-        setSuccessMessage("Changement validé ✔");
+      if (formData.newPassword.trim() !== formData.confirmNewPassword.trim()) {
+        setErrors({
+          confirmNewPassword: "Les deux mots de passe ne correspondent pas",
+        });
+        return;
       }
+
+      const response = await axios.put(
+        `http://localhost:3310/api/users/${user.id}`,
+        {
+          firstname: formData.firstname,
+          lastname: formData.lastname,
+          pseudoname: formData.pseudoname.trim(),
+          currentPassword: formData.currentPassword.trim(),
+          newPassword: formData.newPassword.trim(),
+          confirmNewPassword: formData.confirmNewPassword.trim(),
+        }
+      );
+
+      const updatedUser = response.data.user;
+
+      setFormData((prevData) => ({
+        ...prevData,
+        ...updatedUser,
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      }));
+
+      setSuccessMessage("Changement validé ✔");
     } catch (errorCaught) {
       console.error("Error during form submission:", errorCaught);
 
