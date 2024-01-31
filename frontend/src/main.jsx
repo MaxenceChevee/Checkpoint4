@@ -18,6 +18,8 @@ import "./styles/Global.scss";
 import BlackJackGame from "./pages/BlackJackGame";
 import Settings from "./pages/Settings";
 import Wheelset from "./pages/Wheelset";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const PrivateRoute = ({ element }) => {
   const { user } = useAuth();
@@ -45,6 +47,8 @@ const Main = () => {
       <Route path="/" element={<App />}>
         <Route index element={<Home />} />
         <Route path="games" element={<Games />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password/:token" element={<ResetPassword />} />
         <Route
           path="blackjack-game"
           element={<PrivateRoute element={<BlackJackGame />} />}

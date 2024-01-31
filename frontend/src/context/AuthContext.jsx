@@ -127,6 +127,33 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const sendPasswordResetEmail = async (email) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/forgot-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mail: email }),
+        }
+      );
+
+      if (response.ok) {
+        return "Password reset email sent successfully";
+      }
+
+      const data = await response.json();
+      throw new Error(data.message || "Error sending password reset email");
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
+      throw new Error(
+        "An error occurred while sending the password reset email"
+      );
+    }
+  };
+
   const authContextValue = useMemo(() => {
     return {
       user,
@@ -134,6 +161,7 @@ const AuthProvider = ({ children }) => {
       updateCredits,
       logout,
       editUser,
+      sendPasswordResetEmail,
       setUser: (newUser) => {
         setUser(newUser);
       },
