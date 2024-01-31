@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import Popup from "../components/Popup";
@@ -16,6 +16,7 @@ const Inscription = () => {
   const [popupData, setPopupData] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const formRef = useRef(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -71,13 +72,18 @@ const Inscription = () => {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleInscription();
+  };
+
   return (
     <div className="inscription-form-container">
       <h2>Inscription</h2>
       {errorMessage && (
         <p className="inscription-error-message">{errorMessage}</p>
       )}
-      <form onSubmit={handleInscription}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <div>
           <label className="inscription-form-label">
             Prénom:
@@ -154,17 +160,13 @@ const Inscription = () => {
             />
           </label>
         </div>
-        <button
-          type="button"
-          onClick={handleInscription}
-          className="inscription-form-button"
-        >
+        <button type="submit" className="inscription-form-button">
           S'inscrire
         </button>
       </form>
       <p>
-        Vous avez déja un compte ?
-        <Link to="/inscription" className="signup-link">
+        Vous avez déjà un compte ?
+        <Link to="/connexion" className="signup-link">
           Connectez-vous
         </Link>
       </p>
