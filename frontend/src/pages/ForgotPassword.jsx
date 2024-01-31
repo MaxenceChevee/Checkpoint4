@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Popup from "../components/Popup";
 import { useAuth } from "../context/AuthContext";
+import "../styles/ForgotPassword.scss";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");

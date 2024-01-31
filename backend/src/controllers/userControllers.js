@@ -68,8 +68,16 @@ const sendPasswordResetEmail = async (user, resetToken) => {
   const mailOptions = {
     from: "origin.digital@outlook.com",
     to: user.mail,
-    subject: "Password reset",
-    text: `Click on the following link to reset your password: ${resetLink}`,
+    subject: "Réinitialisation de mot de passe",
+    html: `
+      <p>Bonjour ${user.firstname},</p>
+      <p>Vous avez demandé une réinitialisation de mot de passe pour votre compte.</p>
+      <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+      <a href="${resetLink}">Réinitialiser le mot de passe</a>
+      <p>Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer ce message.</p>
+      <p>Merci,</p>
+      <p>Votre équipe ${process.env.APP_NAME || "Roll Rich"}</p>
+    `,
   };
 
   await transporter.sendMail(mailOptions);
@@ -112,6 +120,22 @@ const resetPassword = async (req, res) => {
 
     if (!password) {
       return res.status(400).json({ message: "New password missing" });
+    }
+
+    // Utilisez Joi pour valider le mot de passe
+    const { error } = Joi.string()
+      .min(8)
+      .regex(/[A-Z]/)
+      .message("Le mot de passe doit contenir au moins une majuscule.")
+      .regex(/\d/)
+      .message("Le mot de passe doit contenir au moins un chiffre.")
+      .regex(/[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/)
+      .message("Le mot de passe doit contenir au moins un caractère spécial.")
+      .validate(password);
+
+    if (error) {
+      // Si une erreur de validation Joi se produit, renvoyez les détails au client
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);

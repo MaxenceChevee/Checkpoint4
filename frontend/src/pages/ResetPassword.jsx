@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Popup from "../components/Popup";
+import "../styles/ResetPassword.scss";
 
 function ResetPassword() {
   const { token } = useParams();
@@ -62,7 +63,7 @@ function ResetPassword() {
         setError(data.message || "Error resetting password");
       }
     } catch (catchError) {
-      console.error("Error during password reset:", error);
+      console.error("Error during password reset:", catchError);
       setError("Internal server error");
     }
   };
