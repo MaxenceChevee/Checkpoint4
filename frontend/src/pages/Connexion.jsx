@@ -6,12 +6,12 @@ import "../styles/Connexion.scss";
 
 const Connexion = () => {
   const { user: isLoggedIn } = useAuth();
-  const [, setHasLogged] = useState(false);
   const [user, setUser] = useState({
     mail: "",
     password: "",
   });
   const [loginStatus, setLoginStatus] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -20,6 +20,7 @@ const Connexion = () => {
       ...prevUser,
       [name]: value,
     }));
+    setErrorMessage("");
   };
 
   const handleConnexion = async () => {
@@ -35,12 +36,20 @@ const Connexion = () => {
 
       setLoginStatus("Connexion réussie");
 
-      setHasLogged(true);
-
       console.info(response.data);
     } catch (error) {
       console.error("Error during login:", error);
-      setLoginStatus("Erreur lors de la connexion");
+      if (error.response) {
+        const { status, data } = error.response;
+
+        if (status === 401) {
+          setErrorMessage(data.message);
+        } else {
+          setErrorMessage("Erreur lors de la connexion");
+        }
+      } else {
+        setErrorMessage("Erreur lors de la connexion au serveur");
+      }
     }
   };
 
@@ -60,9 +69,11 @@ const Connexion = () => {
       </div>
     );
   }
+
   return (
     <div className="form-container">
       <h2>Connexion</h2>
+      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
       <form onSubmit={handleConnexion}>
         <div>
           <label>

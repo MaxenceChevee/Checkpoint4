@@ -30,6 +30,20 @@ class UserManager extends AbstractManager {
     }
   }
 
+  async getByPseudoname(pseudoname) {
+    try {
+      const [user] = await this.database.query(
+        `SELECT * FROM ${this.table} WHERE pseudoname = ?`,
+        [pseudoname]
+      );
+
+      return user[0];
+    } catch (error) {
+      console.error("Error fetching user by pseudoname:", error);
+      throw error;
+    }
+  }
+
   async read(id, field) {
     if (field) {
       const [rows] = await this.database.query(

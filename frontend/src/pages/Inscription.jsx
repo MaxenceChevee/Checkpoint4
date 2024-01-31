@@ -10,6 +10,7 @@ const Inscription = () => {
     pseudoname: "",
     mail: "",
     password: "",
+    confirmPassword: "",
   });
   const [registrationStatus, setRegistrationStatus] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -20,32 +21,41 @@ const Inscription = () => {
       ...prevUser,
       [name]: value,
     }));
+    setErrorMessage("");
   };
 
   const handleInscription = async () => {
     try {
       const response = await axios.post(
         "http://localhost:3310/api/users",
-        user
+        JSON.stringify(user),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       const { token } = response.data;
 
-      localStorage.setItem("token", token);
+      if (token && registrationStatus === "Vous êtes bien inscrit") {
+        localStorage.setItem("token", token);
+      }
 
       setRegistrationStatus("Vous êtes bien inscrit");
     } catch (error) {
       console.error("Error during registration:", error);
 
-      if (
-        error.response &&
-        error.response.status === 400 &&
-        error.response.data.message ===
-          "Cette adresse e-mail est déjà enregistrée."
-      ) {
-        setErrorMessage("Adresse e-mail déjà enregistrée.");
+      if (error.response) {
+        const { status, data } = error.response;
+
+        if (status === 400 && data.message) {
+          setErrorMessage(data.message);
+        } else {
+          setErrorMessage("Erreur lors de l'inscription");
+        }
       } else {
-        setErrorMessage("Erreur lors de l'inscription");
+        setErrorMessage("Erreur lors de la connexion au serveur");
       }
     }
   };
@@ -58,6 +68,7 @@ const Inscription = () => {
       </div>
     );
   }
+
   return (
     <div className="form-container">
       <h2>Inscription</h2>
@@ -106,13 +117,25 @@ const Inscription = () => {
               onChange={handleInputChange}
             />
           </label>
-
+        </div>
+        <div>
           <label>
             Password:
             <input
               type="password"
               name="password"
               value={user.password}
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Confirm Password:
+            <input
+              type="password"
+              name="confirmPassword"
+              value={user.confirmPassword}
               onChange={handleInputChange}
             />
           </label>
