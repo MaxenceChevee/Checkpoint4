@@ -64,6 +64,8 @@ function Settings() {
           newPassword: "",
           confirmNewPassword: "",
         }));
+
+        setSuccessMessage("Changement validé ✔");
       } else {
         setSuccessMessage("Changement validé ✔");
       }
