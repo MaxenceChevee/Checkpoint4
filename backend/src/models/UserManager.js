@@ -16,6 +16,20 @@ class UserManager extends AbstractManager {
     return result.insertId;
   }
 
+  async getById(id) {
+    try {
+      const [user] = await this.database.query(
+        `SELECT * FROM ${this.table} WHERE id = ?`,
+        [id]
+      );
+
+      return user[0];
+    } catch (error) {
+      console.error("Error fetching user by id:", error);
+      throw error;
+    }
+  }
+
   async getByMail(mail) {
     try {
       const [user] = await this.database.query(
@@ -26,6 +40,20 @@ class UserManager extends AbstractManager {
       return user[0];
     } catch (error) {
       console.error("Error fetching user by mail:", error);
+      throw error;
+    }
+  }
+
+  async getByPseudoname(pseudoname) {
+    try {
+      const [user] = await this.database.query(
+        `SELECT * FROM ${this.table} WHERE pseudoname = ?`,
+        [pseudoname]
+      );
+
+      return user[0];
+    } catch (error) {
+      console.error("Error fetching user by pseudoname:", error);
       throw error;
     }
   }
@@ -86,12 +114,12 @@ class UserManager extends AbstractManager {
   async updateCredits(id, credits) {
     try {
       const [result] = await this.database.query(
-        `UPDATE ${this.table} SET credits = ? WHERE id = ?`,
+        `UPDATE ${this.table} SET credits = ?, last_wheel_spin = CURRENT_TIMESTAMP WHERE id = ?`,
         [credits, id]
       );
 
       if (result.affectedRows === 0) {
-        throw new Error("Invalid credit operation: insufficient credits");
+        throw new Error("Opération de crédit invalide : crédits insuffisants");
       }
 
       const [updatedUser] = await this.database.query(
@@ -101,13 +129,23 @@ class UserManager extends AbstractManager {
 
       return updatedUser[0];
     } catch (error) {
-      console.error("Error updating credits:", error);
+      console.error("Erreur lors de la mise à jour des crédits :", error);
       throw error;
     }
   }
 
   async delete(id) {
     await this.database.query(`DELETE FROM ${this.table} WHERE id = ?`, [id]);
+  }
+
+  async checkWheelSpin(userId) {
+    const user = await this.read(userId);
+
+    const lastWheelSpin = user.last_wheel_spin;
+    if (lastWheelSpin && new Date() - lastWheelSpin < 24 * 60 * 60 * 1000) {
+      throw new Error("La roue peut être tournée une fois par jour.");
+    }
+    return true;
   }
 }
 

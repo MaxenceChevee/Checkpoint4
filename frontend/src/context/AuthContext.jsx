@@ -57,7 +57,6 @@ const AuthProvider = ({ children }) => {
       console.error("Error updating credits on server:", error);
     }
   };
-
   const updateCredits = async (newCredits) => {
     try {
       if (
@@ -67,6 +66,11 @@ const AuthProvider = ({ children }) => {
         user.credits === undefined
       ) {
         console.error("Invalid user or user credits");
+        return;
+      }
+
+      if (typeof newCredits !== "number" || Number.isNaN(newCredits)) {
+        console.error("Invalid newCredits. Must be a valid number.");
         return;
       }
 
@@ -124,7 +128,16 @@ const AuthProvider = ({ children }) => {
   };
 
   const authContextValue = useMemo(() => {
-    return { user, loading, updateCredits, logout, editUser };
+    return {
+      user,
+      loading,
+      updateCredits,
+      logout,
+      editUser,
+      setUser: (newUser) => {
+        setUser(newUser);
+      },
+    };
   }, [user, loading, logout]);
 
   return (

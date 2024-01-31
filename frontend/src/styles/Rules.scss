@@ -1,0 +1,48 @@
+.fixed-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1a1a1a;
+  color: #e5bd00;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.about-container {
+  text-align: center;
+  overflow-y: auto;
+}
+
+.title-header {
+  margin-bottom: 20px;
+
+  h2 {
+    font-size: 24px;
+    color: #e5bd00;
+  }
+}
+
+.text-about {
+  line-height: 1.6;
+  text-align: justify;
+  max-width: 800px;
+  margin: auto;
+  padding: 1rem;
+  background: linear-gradient(to right, #1a1a1a, #534a15ad);
+  border-radius: 6px;
+
+  h3 {
+    color: #e5bd00;
+    margin-top: 20px;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+
+    li {
+      margin-bottom: 10px;
+    }
+  }
+}

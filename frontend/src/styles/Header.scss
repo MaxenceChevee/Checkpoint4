@@ -2,10 +2,17 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background-color: #000000;
   padding: 0;
+  overflow: hidden;
   width: 100vw;
   overflow-x: hidden;
+  background: linear-gradient(to right, #1a1a1a, #534a15ad);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.1);
+  @media (max-width: 480px) {
+    min-height: 60px;
+  }
 }
 .game-name {
   color: #b8860b;
@@ -70,6 +77,24 @@
 
   .navbar.menu-open .mobile-menu {
     display: flex;
-    width: 10rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    width: 100%;
+    background-color: #000000;
+
+    a {
+      text-decoration: none;
+      color: white;
+      font-size: 18px;
+      margin: 1rem;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #b8860b;
+      }
+    }
   }
 }
