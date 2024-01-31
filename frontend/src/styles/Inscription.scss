@@ -1,47 +1,68 @@
-.form-container {
-  max-width: 400px;
+.inscription-form-container {
+  max-width: 800px;
   padding: 20px;
   margin: auto;
-  background-color: #fff;
-  border-radius: 8px;
+  background: linear-gradient(to right, #1a1a1a, #534a15ad);
+  border-radius: 6px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  text-align: center;
-  color: #333;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #333;
-}
-
-input {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 16px;
   box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+
+  h2 {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .inscription-form-label {
+    margin-bottom: 10px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+
+    .inscription-form-input {
+      padding: 8px;
+      font-size: 14px;
+      background-color: #fff;
+      color: #333;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+
+      &.inscription-error-input {
+        border: 1px solid red;
+      }
+    }
+  }
+
+  .inscription-form-button {
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    margin-top: 10px;
+
+    &:hover {
+      background-color: #45a049;
+    }
+  }
+
+  .inscription-error-message {
+    margin-top: 10px;
+    color: red;
+  }
 }
 
-.button-register {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.button-register:hover {
-  background-color: #0056b3;
+.inscription-success {
+  background-color: #5cb85c;
 }

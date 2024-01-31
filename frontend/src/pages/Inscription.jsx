@@ -70,77 +70,89 @@ const Inscription = () => {
   }
 
   return (
-    <div className="form-container">
+    <div className="inscription-form-container">
       <h2>Inscription</h2>
-      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+      {errorMessage && (
+        <p className="inscription-error-message">{errorMessage}</p>
+      )}
       <form onSubmit={handleInscription}>
         <div>
-          <label>
+          <label className="inscription-form-label">
             Firstname:
             <input
               type="text"
               name="firstname"
               value={user.firstname}
               onChange={handleInputChange}
+              className="inscription-form-input"
             />
           </label>
         </div>
         <div>
-          <label>
+          <label className="inscription-form-label">
             Lastname:
             <input
               type="text"
               name="lastname"
               value={user.lastname}
               onChange={handleInputChange}
+              className="inscription-form-input"
             />
           </label>
         </div>
         <div>
-          <label>
+          <label className="inscription-form-label">
             Pseudoname:
             <input
               type="text"
               name="pseudoname"
               value={user.pseudoname}
               onChange={handleInputChange}
+              className="inscription-form-input"
             />
           </label>
         </div>
         <div>
-          <label>
+          <label className="inscription-form-label">
             Mail:
             <input
               type="text"
               name="mail"
               value={user.mail}
               onChange={handleInputChange}
+              className="inscription-form-input"
             />
           </label>
         </div>
         <div>
-          <label>
+          <label className="inscription-form-label">
             Password:
             <input
               type="password"
               name="password"
               value={user.password}
               onChange={handleInputChange}
+              className="inscription-form-input"
             />
           </label>
         </div>
         <div>
-          <label>
+          <label className="inscription-form-label">
             Confirm Password:
             <input
               type="password"
               name="confirmPassword"
               value={user.confirmPassword}
               onChange={handleInputChange}
+              className="inscription-form-input"
             />
           </label>
         </div>
-        <button type="button" onClick={handleInscription}>
+        <button
+          type="button"
+          onClick={handleInscription}
+          className="inscription-form-button"
+        >
           S'inscrire
         </button>
       </form>

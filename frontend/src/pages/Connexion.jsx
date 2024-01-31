@@ -71,11 +71,13 @@ const Connexion = () => {
   }
 
   return (
-    <div className="form-container">
+    <div className="connexion-form-container">
       <h2>Connexion</h2>
-      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+      {errorMessage && (
+        <p className="connexion-error-message">{errorMessage}</p>
+      )}
       <form onSubmit={handleConnexion}>
-        <div>
+        <div className="connexion-form-label">
           <label>
             Mail:
             <input
@@ -83,10 +85,11 @@ const Connexion = () => {
               name="mail"
               value={user.mail}
               onChange={handleInputChange}
+              className="connexion-form-input"
             />
           </label>
         </div>
-        <div>
+        <div className="connexion-form-label">
           <label>
             Password:
             <input
@@ -94,15 +97,19 @@ const Connexion = () => {
               name="password"
               value={user.password}
               onChange={handleInputChange}
+              className="connexion-form-input"
             />
           </label>
         </div>
-        <button type="button" onClick={handleConnexion}>
+        <button
+          type="button"
+          onClick={handleConnexion}
+          className="connexion-form-button"
+        >
           Se connecter
         </button>
       </form>
     </div>
   );
 };
-
 export default Connexion;
