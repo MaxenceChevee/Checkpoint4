@@ -132,7 +132,7 @@ function Settings() {
 
   return (
     <div className="settings-container">
-      <h2>Settings</h2>
+      <h2>Paramètres du compte</h2>
       {Object.keys(errors).length > 0 && (
         <div>
           {Object.entries(errors).map(([field, message]) => (
@@ -147,7 +147,7 @@ function Settings() {
 
       <form className="settings-list-container" onSubmit={handleSubmit}>
         <label>
-          First Name:
+          Prénom:
           <input
             type="text"
             name="firstname"
@@ -156,7 +156,7 @@ function Settings() {
           />
         </label>
         <label>
-          Last Name:
+          Nom:
           <input
             type="text"
             name="lastname"
@@ -165,7 +165,7 @@ function Settings() {
           />
         </label>
         <label>
-          Pseudoname:
+          Pseudo:
           <input
             type="text"
             name="pseudoname"
@@ -174,7 +174,7 @@ function Settings() {
           />
         </label>
         <label>
-          Current Password:
+          Mot de passe actuel:
           <input
             type="password"
             name="currentPassword"
@@ -183,7 +183,11 @@ function Settings() {
           />
         </label>
         <label>
-          New Password:
+          Nouveau mot de passe:
+          <p className="password-info">
+            (8 caractères minimum dont 1 majuscule, 1 minuscule, 1 chiffre et 1
+            caractère spécial)
+          </p>
           <input
             type="password"
             name="newPassword"
@@ -192,7 +196,7 @@ function Settings() {
           />
         </label>
         <label>
-          Confirm New Password:
+          Confirmer le nouveau mot de passe:
           <input
             type="password"
             name="confirmNewPassword"
@@ -201,9 +205,13 @@ function Settings() {
           />
         </label>
 
-        <button type="submit">Save Changes</button>
-        <button type="button" onClick={handleDeleteAccount}>
-          Delete Account
+        <button type="submit">Sauvegarder les changements</button>
+        <button
+          type="button"
+          className="button-delete"
+          onClick={handleDeleteAccount}
+        >
+          Supprimer le compte
         </button>
       </form>
 
@@ -213,20 +221,22 @@ function Settings() {
       {showDeletePopup && (
         <div className="overlay">
           <div className="custom-popup">
-            <p>Are you sure you want to delete your account?</p>
+            <p>
+              Etes vous sur de vouloir supprimer définitivement votre compte ?
+            </p>
             <button
               type="button"
               className="button-yes"
               onClick={confirmDeleteAccount}
             >
-              Yes
+              Oui
             </button>
             <button
               type="button"
               className="button-no"
               onClick={cancelDeleteAccount}
             >
-              No
+              Non
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Popup from "../components/Popup";
 import "../styles/Connexion.scss";
@@ -14,6 +14,7 @@ const Connexion = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
+  const formRef = useRef(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -64,13 +65,18 @@ const Connexion = () => {
     window.location.reload();
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleConnexion();
+  };
+
   return (
     <div className="connexion-form-container">
-      <h2>Connexion</h2>
+      <h2>Connectez-vous</h2>
       {errorMessage && (
         <p className="connexion-error-message">{errorMessage}</p>
       )}
-      <form onSubmit={handleConnexion}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <div className="connexion-form-label">
           <label>
             Mail:
@@ -85,7 +91,7 @@ const Connexion = () => {
         </div>
         <div className="connexion-form-label">
           <label>
-            Password:
+            Mot de passe:
             <input
               type="password"
               name="password"
@@ -95,15 +101,16 @@ const Connexion = () => {
             />
           </label>
         </div>
-        <button
-          type="button"
-          onClick={handleConnexion}
-          className="connexion-form-button"
-        >
+        <button type="submit" className="connexion-form-button">
           Se connecter
         </button>
       </form>
-
+      <p>
+        Vous n'avez pas de compte ?
+        <Link to="/inscription" className="signup-link">
+          Inscrivez-vous
+        </Link>
+      </p>
       {showPopup && (
         <Popup message="Connexion réussie" onClose={handlePopupClose} />
       )}

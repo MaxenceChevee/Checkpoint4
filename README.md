@@ -1,79 +1,43 @@
-## Concept
+# Blackjack Game
 
-This template is meant to serve as a foundation for every P2/P3 following the React-Express-MySQL stack, as learned in Wild Code School.
-It's pre-configured with a set of tools which'll help students produce industry-quality and easier-to-maintain code, while staying a pedagogical tool.
+Bienvenue dans le jeu de blackjack fictif ! Un projet simple et divertissant pour passer le temps. Ce jeu vous permet de jouer au blackjack et de tourner une roue pour gagner des crédits.
 
-## Setup & Use
+## Fonctionnalités
 
-### Windows users
+- **Blackjack Game:** Jouez au blackjack contre un croupier virtuel.
+- **Roue de la Chance:** Tournez la roue une fois par jour pour gagner des crédits bonus.
+- **Gestion des Crédits:** Suivez votre solde de crédits et misez-les judicieusement.
+- **Technologies Utilisées:**
+  - **Node.js et Express.js:** Le serveur est construit avec Node.js et Express.js pour gérer les requêtes et les réponses.
+  - **SQL:** La base de données utilise SQL pour stocker les informations sur les utilisateurs, les crédits, etc.
+  - **React.js:** La partie front-end du jeu est développée avec React.js, offrant une expérience utilisateur interactive.
+  - **Axios:** Axios est utilisé pour effectuer des requêtes HTTP entre le client et le serveur.
+  - **Sass:** Les styles sont gérés avec Sass, offrant une structure CSS plus modulaire et élégante.
+  - **React-Wheel-of-Prizes:** La roue de la chance est implémentée avec la bibliothèque React-Wheel-of-Prizes, offrant une expérience ludique pour gagner des crédits.
+  - **Jsonwebtoken:** Jsonwebtoken est utilisé pour gérer l'authentification et la sécurité du jeu.
 
-Be sure to run these commands in a git terminal to avoid [issues with newline formats](https://en.wikipedia.org/wiki/Newline#Issues_with_different_newline_formats):
+## Installation
 
-```
-git config --global core.eol lf
-git config --global core.autocrlf false
-```
+1. Clonez le repo : `git clone https://github.com/Maxence/Chevee/Checkpoint4`
+2. Installez les dépendances du serveur : `cd server && npm install`
+3. Installez les dépendances du client : `cd client && npm install`
 
-### Project Initialization
+## Configuration
 
-- In VSCode, install plugins **Prettier - Code formatter** and **ESLint** and configure them
-- Clone this repo, enter it
-- Run command `npm install`
-- Create environment files (`.env`) in both `backend` and `frontend`: you can copy `.env.sample` files as starters (**don't** delete them)
+1. Configurez la base de données SQL avec les scripts fournis dans le dossier `server/database`.
+2. Modifiez le fichier `.env` avec les informations nécessaires.
 
-### Available Commands
+## Démarrage
 
-- `db:migrate` : Run the database migration script
-- `db:seed` : Run the database seed script
-- `dev` : Starts both servers (frontend + backend) in one terminal
-- `dev-front` : Starts the React frontend server
-- `dev-back` : Starts the Express backend server
-- `lint` : Runs validation tools (will be executed on every _commit_, and refuse unclean code)
+- Démarrer le serveur : `cd server && npm run dev`
+- Démarrer le client : `cd client && npm start`
 
-## FAQ
+Le serveur sera accessible à l'adresse `http://localhost:3310` et le client à `http://localhost:3000`.
 
-### Tools
+## Captures d'écran
 
-- _Concurrently_ : Allows for several commands to run concurrently in the same CLI
-- _Husky_ : Allows to execute specific commands that trigger on _git_ events
-- _Vite_ : Alternative to _Create-React-App_, packaging less tools for a more fluid experience
-- _ESLint_ : "Quality of code" tool, ensures chosen rules will be enforced
-- _Prettier_ : "Quality of code" tool as well, focuses on the styleguide
-- _ Airbnb Standard_ : One of the most known "standards", even though it's not officially linked to ES/JS
+![Capture d'écran du jeu](https://i.postimg.cc/nLb8rj6Z/Capture-d-cran-167.png)
 
-## Deployment with Traefik
+## Auteurs
 
-> ⚠️ Prerequisites : You must have installed and configured Traefik on your VPS beforehand.
-> https://github.com/WildCodeSchool/vps-traefik-starter-kit/
-
-For deployment, you have to go to `secrets` → app `actions` on the github repo to insert via `New repository secret` :
-
-- SSH_HOST : IP address of your VPS
-- SSH_USER : SSH login to your VPS
-- SSH_PASSWORD : SSH connection password to your VPS
-
-And a public variable from the tab `/settings/variables/actions` :
-
-- PROJECT_NAME : the name of the project used to create the subdomain.
-
-> ⚠️ Warning : underscores are not allowed. They can cause trouble with the let's encrypt certificate
-
-Use this same tab to add the other environment variables required for the project if any.
-
-Only the backend will be accessible. The root path `"/"` will redirect to the dist folder on your frontend. In order to allow that, please uncomment the line as explain on `backend/src/app.js` (Line 102).
-Because the backend will serve the front, the global variable VITE_BACKEND_URL will be set with an empty string.
-
-Your url will be ` https://${PROJECT-NAME}.${subdomain}.wilders.dev/`.
-
-### About the database
-
-The database is automaticaly deployed with the name of your repo. During the build of the projet (`docker-entry.sh`), the `node migrate.js` command is executed in the backend. If you want to seed automaticaly your database using the `seed.js` script, replace the command _build_ on you `backend/package.json` by `node migrate.js && node seed.js`.
-
-### About public assets (pictures, fonts...)
-
-Don't use any public folder on your frontend. This folder won't be accessible online. You may move your public assets in the `backend/public` folder. Prefer [static assets](https://vitejs.dev/guide/assets) when possible.
-
-### About Logs
-
-If you want to access the logs of your online projet (to follow the deployement or to watch any bug error), connect to your VPS (`ssh user@host`).
-Then, go on your specific project and run  `docker compose logs -t -f`.
+- **Maxence Chevée**
