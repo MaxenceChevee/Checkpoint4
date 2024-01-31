@@ -1,6 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Popup from "../components/Popup";
 import "../styles/Inscription.scss";
 
 const Inscription = () => {
@@ -12,8 +13,9 @@ const Inscription = () => {
     password: "",
     confirmPassword: "",
   });
-  const [registrationStatus, setRegistrationStatus] = useState(null);
+  const [popupData, setPopupData] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -25,8 +27,18 @@ const Inscription = () => {
   };
 
   const handleInscription = async () => {
+    // Vérifier les conditions avant d'envoyer la requête
+    if (
+      user.firstname.length < 2 ||
+      user.lastname.length < 2 ||
+      user.pseudoname.length < 2
+    ) {
+      setErrorMessage("Les champs doivent contenir au moins 2 caractères.");
+      return;
+    }
+
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:3310/api/users",
         JSON.stringify(user),
         {
@@ -36,13 +48,13 @@ const Inscription = () => {
         }
       );
 
-      const { token } = response.data;
-
-      if (token && registrationStatus === "Vous êtes bien inscrit") {
-        localStorage.setItem("token", token);
-      }
-
-      setRegistrationStatus("Vous êtes bien inscrit");
+      setPopupData({
+        message: "Vous êtes bien inscrit",
+        onClose: () => {
+          setPopupData(null);
+          navigate("/connexion"); // Redirige vers la page de connexion
+        },
+      });
     } catch (error) {
       console.error("Error during registration:", error);
 
@@ -59,15 +71,6 @@ const Inscription = () => {
       }
     }
   };
-
-  if (registrationStatus === "Vous êtes bien inscrit") {
-    return (
-      <div className="form-container">
-        <h2>{registrationStatus}</h2>
-        <Link to="/">Retour à l'accueil</Link>
-      </div>
-    );
-  }
 
   return (
     <div className="inscription-form-container">
@@ -156,6 +159,9 @@ const Inscription = () => {
           S'inscrire
         </button>
       </form>
+      {popupData && (
+        <Popup message={popupData.message} onClose={popupData.onClose} />
+      )}
     </div>
   );
 };

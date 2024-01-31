@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Popup from "../components/Popup";
 import "../styles/Connexion.scss";
 
 const Connexion = () => {
@@ -10,8 +11,8 @@ const Connexion = () => {
     mail: "",
     password: "",
   });
-  const [loginStatus, setLoginStatus] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -33,8 +34,7 @@ const Connexion = () => {
       const { token } = response.data;
 
       localStorage.setItem("token", token);
-
-      setLoginStatus("Connexion réussie");
+      setShowPopup(true);
 
       console.info(response.data);
     } catch (error) {
@@ -59,16 +59,10 @@ const Connexion = () => {
     }
   }, [isLoggedIn, navigate]);
 
-  if (loginStatus === "Connexion réussie") {
-    return (
-      <div className="form-container">
-        <h2>{loginStatus}</h2>
-        <button type="button" onClick={() => window.location.reload()}>
-          Retour à l'accueil
-        </button>
-      </div>
-    );
-  }
+  const handlePopupClose = () => {
+    setShowPopup(false);
+    window.location.reload();
+  };
 
   return (
     <div className="connexion-form-container">
@@ -109,7 +103,12 @@ const Connexion = () => {
           Se connecter
         </button>
       </form>
+
+      {showPopup && (
+        <Popup message="Connexion réussie" onClose={handlePopupClose} />
+      )}
     </div>
   );
 };
+
 export default Connexion;

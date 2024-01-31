@@ -16,6 +16,7 @@ function Settings() {
   });
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   useEffect(() => {
     setFormData({
@@ -88,44 +89,46 @@ function Settings() {
     }
   }
 
-  async function handleDeleteAccount() {
-    setErrors({});
+  const handleDeleteAccount = () => {
+    setShowDeletePopup(true);
+  };
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete your account?"
-    );
+  const confirmDeleteAccount = async () => {
+    try {
+      await axios.delete(`http://localhost:3310/api/users/${user.id}`, {
+        data: {
+          currentPassword: formData.currentPassword
+            ? formData.currentPassword.trim()
+            : undefined,
+        },
+      });
 
-    if (confirmed) {
-      try {
-        await axios.delete(`http://localhost:3310/api/users/${user.id}`, {
-          data: {
-            currentPassword: formData.currentPassword
-              ? formData.currentPassword.trim()
-              : undefined,
-          },
-        });
+      logout();
+    } catch (errorCaught) {
+      console.error("Error during account deletion:", errorCaught);
 
-        logout();
-      } catch (errorCaught) {
-        console.error("Error during account deletion:", errorCaught);
+      if (errorCaught.response && errorCaught.response.data) {
+        const { errors: responseErrors, message } = errorCaught.response.data;
 
-        if (errorCaught.response && errorCaught.response.data) {
-          const { errors: responseErrors, message } = errorCaught.response.data;
-
-          if (responseErrors) {
-            setErrors(responseErrors);
-          } else if (message) {
-            setErrors({ general: message });
-          }
-        } else {
-          setErrors({
-            general:
-              "Une erreur s'est produite lors de la suppression du compte.",
-          });
+        if (responseErrors) {
+          setErrors(responseErrors);
+        } else if (message) {
+          setErrors({ general: message });
         }
+      } else {
+        setErrors({
+          general:
+            "Une erreur s'est produite lors de la suppression du compte.",
+        });
       }
+    } finally {
+      setShowDeletePopup(false);
     }
-  }
+  };
+
+  const cancelDeleteAccount = () => {
+    setShowDeletePopup(false);
+  };
 
   return (
     <div className="settings-container">
@@ -206,6 +209,28 @@ function Settings() {
 
       {errors.general && <p style={{ color: "red" }}>{errors.general}</p>}
       {successMessage && <p>{successMessage}</p>}
+
+      {showDeletePopup && (
+        <div className="overlay">
+          <div className="custom-popup">
+            <p>Are you sure you want to delete your account?</p>
+            <button
+              type="button"
+              className="button-yes"
+              onClick={confirmDeleteAccount}
+            >
+              Yes
+            </button>
+            <button
+              type="button"
+              className="button-no"
+              onClick={cancelDeleteAccount}
+            >
+              No
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
