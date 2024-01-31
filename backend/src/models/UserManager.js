@@ -85,13 +85,6 @@ class UserManager extends AbstractManager {
 
   async updateCredits(id, credits) {
     try {
-      const user = await this.read(id);
-
-      const lastWheelSpin = user.last_wheel_spin;
-      if (lastWheelSpin && new Date() - lastWheelSpin < 24 * 60 * 60 * 1000) {
-        throw new Error("La roue peut être tournée une fois par jour.");
-      }
-
       const [result] = await this.database.query(
         `UPDATE ${this.table} SET credits = ?, last_wheel_spin = CURRENT_TIMESTAMP WHERE id = ?`,
         [credits, id]
@@ -118,24 +111,13 @@ class UserManager extends AbstractManager {
   }
 
   async checkWheelSpin(userId) {
-    try {
-      const [user] = await this.database.query(
-        `SELECT last_wheel_spin FROM ${this.table} WHERE id = ?`,
-        [userId]
-      );
+    const user = await this.read(userId);
 
-      if (!user || !user.last_wheel_spin) {
-        return false;
-      }
-
-      const currentTime = new Date();
-      const lastSpinTime = new Date(user.last_wheel_spin);
-
-      return currentTime - lastSpinTime >= 24 * 60 * 60 * 1000;
-    } catch (error) {
-      console.error("Error checking wheel spin:", error);
-      throw error;
+    const lastWheelSpin = user.last_wheel_spin;
+    if (lastWheelSpin && new Date() - lastWheelSpin < 24 * 60 * 60 * 1000) {
+      throw new Error("La roue peut être tournée une fois par jour.");
     }
+    return true;
   }
 }
 

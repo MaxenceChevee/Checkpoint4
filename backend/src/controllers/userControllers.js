@@ -8,8 +8,6 @@ const secretKey = process.env.APP_SECRET;
 
 const saltRounds = 10;
 
-const UserManager = require("../models/UserManager");
-
 const login = async (req, res) => {
   const { mail, password } = req.body;
 
@@ -215,12 +213,12 @@ const checkWheelSpin = async (req, res) => {
   const userId = req.params.id;
 
   try {
-    const canSpin = await UserManager.checkWheelSpin(userId);
+    const canSpin = await tables.users.checkWheelSpin(userId);
 
     res.status(200).json({ canSpin });
   } catch (error) {
     console.error("Error checking wheel spin:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(400).json({ message: "Roue déjà tourné" });
   }
 };
 module.exports = {

@@ -3,14 +3,34 @@ import axios from "axios";
 import WheelComponent from "react-wheel-of-prizes";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Wheelset.scss";
+import "../styles/ModalStyles.scss";
 
 const Wheelset = () => {
   const { user, setUser } = useAuth();
-  const [isWheelSpinning, setIsWheelSpinning] = useState(false);
+  const canSpinRef = useRef(false);
   const userRef = useRef(user);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     userRef.current = user;
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.id) {
+      axios
+        .get(`http://localhost:3310/api/users/${user.id}/check-wheel-spin`)
+        .then((response) => {
+          canSpinRef.current = response.data.canSpin;
+        })
+        .catch((error) => {
+          if (!errorMessage && !isModalOpen) {
+            setErrorMessage(error.response.data.message);
+            setIsModalOpen(true);
+          }
+          canSpinRef.current = false;
+        });
+    }
   }, [user]);
 
   const segments = ["$10", "$100", "$200", "$500", "$1000"];
@@ -38,6 +58,7 @@ const Wheelset = () => {
 
   const onFinished = async (winner) => {
     try {
+      if (canSpinRef.current === false) return;
       if (!userRef.current || !winner || !winner.startsWith("$")) {
         console.warn("Invalid user or winner. Aborting onFinished.");
         return;
@@ -51,15 +72,6 @@ const Wheelset = () => {
         return;
       }
 
-      const currentTime = new Date();
-      const lastSpinTime = new Date(userRef.current.last_wheel_spin);
-
-      // Vérifier si l'utilisateur a déjà tourné la roue aujourd'hui
-      if (currentTime - lastSpinTime < 24 * 60 * 60 * 1000) {
-        console.warn("La roue peut être tournée une fois par jour.");
-        return;
-      }
-
       await updateUserCreditsOnServer(userRef.current.id, newCredits);
 
       setUser((prevUser) => ({
@@ -67,91 +79,38 @@ const Wheelset = () => {
         credits: newCredits,
         last_wheel_spin: new Date().toISOString(),
       }));
-
-      setIsWheelSpinning(false);
+      setErrorMessage(
+        `Vous avez gagné ${creditsWon} crédits ! Revenez demain pour retenter votre chance !`
+      );
+      setIsModalOpen(true);
     } catch (error) {
       console.error("Error updating credits:", error);
     }
   };
 
-  const performWheelSpin = async () => {
-    try {
-      const jwtToken = localStorage.getItem("token");
-
-      if (!jwtToken || !userRef.current) {
-        console.error("Invalid token or user ID");
-        throw new Error("Invalid token or user ID");
-      }
-
-      // Appel à l'API pour faire tourner la roue
-      const response = await axios.post(
-        `http://localhost:3310/api/wheel/spin`,
-        {},
-        { headers: { "x-auth-token": jwtToken } }
-      );
-
-      if (response.status === 200) {
-        // La rotation de la roue a réussi
-        const { winner, newCredits } = response.data;
-
-        return { winner, newCredits };
-      }
-      // La rotation de la roue a échoué
-      console.error("Error spinning the wheel:", response.statusText);
-      throw new Error("Error spinning the wheel");
-    } catch (error) {
-      console.error("Error spinning the wheel:", error);
-      throw new Error("Error spinning the wheel");
-    }
-  };
-
-  const startWheelSpin = async () => {
-    try {
-      const jwtToken = localStorage.getItem("token");
-
-      if (!jwtToken || !user) {
-        console.error("Invalid token or user ID");
-        return;
-      }
-
-      // Appel à l'API pour vérifier si l'utilisateur peut faire tourner la roue
-      const response = await axios.post(
-        `http://localhost:3310/api/users/${user.id}/check-wheel-spin`,
-        {},
-        { headers: { "x-auth-token": jwtToken } }
-      );
-
-      if (response.status === 200 && response.data.canSpin) {
-        // L'utilisateur peut faire tourner la roue, procédez à la rotation
-        setIsWheelSpinning(true);
-        await performWheelSpin();
-        setIsWheelSpinning(false);
-      } else {
-        console.warn("La roue peut être tournée une fois par jour.");
-      }
-    } catch (error) {
-      console.error("Error starting wheel spin:", error);
-    }
-  };
-
   return (
     <div className="wheel-of-fortune-container">
-      <div className={`wheel ${isWheelSpinning ? "spinning" : ""}`}>
-        <WheelComponent
-          segments={segments}
-          segColors={segColors}
-          onFinished={onFinished}
-          primaryColor="black"
-          contrastColor="white"
-          buttonText="Spin"
-          isOnlyOnce={false}
-          style={{ width: "400px", height: "400px" }}
-          upDuration={500}
-          downDuration={600}
-          fontFamily="Arial"
-          onClick={startWheelSpin}
-        />
-      </div>
+      <WheelComponent
+        segments={segments}
+        segColors={segColors}
+        onFinished={onFinished}
+        primaryColor="black"
+        contrastColor="white"
+        buttonText="Spin"
+        isOnlyOnce={false}
+        upDuration={500}
+        downDuration={600}
+        fontFamily="Arial"
+      />
+
+      {isModalOpen && (
+        <div className="modal-container">
+          <div className="modal-content">
+            <p>{errorMessage}</p>
+          </div>
+          <div className="modal-background" />
+        </div>
+      )}
     </div>
   );
 };
