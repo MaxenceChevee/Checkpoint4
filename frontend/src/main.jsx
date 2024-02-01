@@ -39,7 +39,7 @@ const Main = () => {
   const { user, loading: authLoading } = useAuth();
 
   if (authLoading) {
-    return <div>Loading...</div>;
+    return <div>Chargement...</div>;
   }
 
   return (
@@ -48,7 +48,14 @@ const Main = () => {
         <Route index element={<Home />} />
         <Route path="games" element={<Games />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="reset-password/:token" element={<ResetPassword />} />
+        <Route
+          path="forgot-password"
+          element={user ? <Navigate to="/" /> : <ForgotPassword />}
+        />
+        <Route
+          path="reset-password/:token"
+          element={user ? <Navigate to="/" /> : <ResetPassword />}
+        />
         <Route
           path="blackjack-game"
           element={<PrivateRoute element={<BlackJackGame />} />}

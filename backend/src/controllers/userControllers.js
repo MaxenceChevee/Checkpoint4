@@ -66,7 +66,7 @@ const generateResetToken = (user) => {
 const sendPasswordResetEmail = async (user, resetToken) => {
   const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
   const mailOptions = {
-    from: "origin.digital@outlook.com",
+    from: "Cash.Catalyst@outlook.com",
     to: user.mail,
     subject: "Réinitialisation de mot de passe",
     html: `
@@ -76,7 +76,7 @@ const sendPasswordResetEmail = async (user, resetToken) => {
       <a href="${resetLink}">Réinitialiser le mot de passe</a>
       <p>Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer ce message.</p>
       <p>Merci,</p>
-      <p>Votre équipe ${process.env.APP_NAME || "Roll Rich"}</p>
+      <p>Votre équipe ${process.env.APP_NAME || "CashCatalyst"}</p>
     `,
   };
 
@@ -89,18 +89,24 @@ const forgottenPassword = async (req, res) => {
   try {
     const user = await tables.users.getByMail(mail);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
     const resetToken = generateResetToken(user);
 
     await sendPasswordResetEmail(user, resetToken);
 
-    return res.status(200).json({ message: "Password reset e-mail sent" });
+    return res.status(200).json({
+      message: "Envoi d'un e-mail de réinitialisation du mot de passe",
+    });
   } catch (error) {
-    console.error("Error sending password reset e-mail:", error);
+    console.error(
+      "Erreur dans l'envoi de l'e-mail de réinitialisation du mot de passe:",
+      error
+    );
     return res.status(500).json({
-      message: "Error sending password reset e-mail",
+      message:
+        "Erreur dans l'envoi de l'e-mail de réinitialisation du mot de passe",
     });
   }
 };
@@ -115,14 +121,13 @@ const resetPassword = async (req, res) => {
     const user = await tables.users.read(decodedToken.user);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
     if (!password) {
-      return res.status(400).json({ message: "New password missing" });
+      return res.status(400).json({ message: "Nouveau mot de passe manquant" });
     }
 
-    // Utilisez Joi pour valider le mot de passe
     const { error } = Joi.string()
       .min(8)
       .regex(/[A-Z]/)
@@ -134,18 +139,19 @@ const resetPassword = async (req, res) => {
       .validate(password);
 
     if (error) {
-      // Si une erreur de validation Joi se produit, renvoyez les détails au client
       return res.status(400).json({ message: error.details[0].message });
     }
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     await tables.users.edit(user.id, { password: hashedPassword });
 
-    return res.status(200).json({ message: "Password successfully reset" });
+    return res
+      .status(200)
+      .json({ message: "Réinitialisation du mot de passe réussie" });
   } catch (error) {
-    console.error("Password reset error:", error);
+    console.error("Erreur de réinitialisation du mot de passe:", error);
     return res.status(500).json({
-      message: "Password reset error",
+      message: "Erreur de réinitialisation du mot de passe",
       error,
     });
   }
@@ -391,7 +397,7 @@ const add = async (req, res, next) => {
     res.status(201).json({ insertId, token });
     return insertId;
   } catch (err) {
-    console.error("Error during user registration:", err);
+    console.error("Erreur lors de l'enregistrement de l'utilisateur :", err);
     return next(err);
   }
 };
@@ -429,7 +435,7 @@ const destroy = async (req, res) => {
 
     res.sendStatus(204);
   } catch (err) {
-    console.error("Error during account deletion:", err);
+    console.error("Erreur lors de la suppression du compte :", err);
 
     res.status(500).json({
       errors: {

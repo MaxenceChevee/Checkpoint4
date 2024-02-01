@@ -38,7 +38,7 @@ function ForgotPassword() {
 
   return (
     <div className="auth-form">
-      <h2>Forgot Password</h2>
+      <h2>Réinitialiser le mot de passe</h2>
       <form onSubmit={handleSubmit} className="form-container">
         <label>
           Email:
@@ -49,11 +49,12 @@ function ForgotPassword() {
           />
         </label>
         <button type="submit" disabled={loading}>
-          {loading ? "Sending..." : "Reset Password"}
+          {loading ? "Sending..." : "Recevoir le mail"}
         </button>
       </form>
       <p>
-        Remember your password? <Link to="/connexion">Login here</Link>
+        Vous vous rappelez de votre mot de passe ?
+        <Link to="/connexion">Connectez-vous ici</Link>
       </p>
       {error && <p className="error-message">{error}</p>}
       {popupData && (
