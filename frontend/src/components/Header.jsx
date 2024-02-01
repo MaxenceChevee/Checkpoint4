@@ -21,7 +21,7 @@ function Header() {
       <button type="button" className="menu-button" onClick={toggleMenu}>
         ☰
       </button>
-      <h1 className="game-name">RollRich</h1>
+      <h1 className="game-name">CashCatalyst</h1>
 
       <Link to="/" className="logo-desktop" onClick={closeMenu}>
         Accueil
