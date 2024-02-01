@@ -51,6 +51,8 @@
     border: none;
     border-radius: 4px;
     margin-top: 10px;
+    overflow-y: auto;
+    height: 100vh;
 
     &:hover {
       background-color: #45a049;

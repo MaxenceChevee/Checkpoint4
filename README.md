@@ -37,7 +37,3 @@ Le serveur sera accessible à l'adresse `http://localhost:3310` et le client à 
 ## Captures d'écran
 
 ![Capture d'écran du jeu](https://i.postimg.cc/nLb8rj6Z/Capture-d-cran-167.png)
-
-## Auteurs
-
-- **Maxence Chevée**
