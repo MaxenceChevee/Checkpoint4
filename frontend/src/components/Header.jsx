@@ -51,7 +51,9 @@ function Header() {
         </>
       )}
 
-      <img src={logoImage} alt="Logo" className="logo-image" />
+      <Link to="/" className="logo-container">
+        <img src={logoImage} alt="Logo" className="logo-image" />
+      </Link>
 
       <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
         <Link to="/" className="logo" onClick={closeMenu}>

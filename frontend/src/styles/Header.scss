@@ -14,9 +14,15 @@
     min-height: 60px;
   }
 }
-
-.logo-image {
+.logo-link {
+  display: inline-block;
+}
+.logo-container {
   width: 7%;
+}
+.logo-image {
+  width: 100%;
+  height: auto;
 }
 .logo {
   text-decoration: none;
