@@ -33,8 +33,15 @@ const Wheelset = () => {
     }
   }, [user]);
 
-  const segments = ["$10", "$100", "$200", "$500", "$1000"];
-  const segColors = ["#EE4040", "#F0CF50", "#815CD1", "#3DA5E0", "#34A24F"];
+  const segments = ["$10", "$100", "$200", "$500", "$700", "$1000"];
+  const segColors = [
+    "#B71C1C",
+    "#000000",
+    "#B71C1C",
+    "#000000",
+    "#B71C1C",
+    "#000000",
+  ];
 
   const updateUserCreditsOnServer = async (userId, newCredits) => {
     try {

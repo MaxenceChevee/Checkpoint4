@@ -12,6 +12,8 @@ router.get("/users/:id", userControllers.read);
 router.put("/users/:id", userControllers.edit);
 router.get("/users/:id/check-wheel-spin", userControllers.checkWheelSpin);
 router.post("/users", userControllers.add);
+router.post("/forgot-password", userControllers.forgottenPassword);
+router.post("/reset-password/:token", userControllers.resetPassword);
 router.put("/users/:id/credits", verifyToken, userControllers.updateCredits);
 router.delete("/users/:id", userControllers.destroy);
 

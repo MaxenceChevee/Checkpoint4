@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Header.scss";
-import logoImage from "../assets/Roll1.png";
+import logoImage from "../assets/Cash5.png";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,7 +21,6 @@ function Header() {
       <button type="button" className="menu-button" onClick={toggleMenu}>
         ☰
       </button>
-      <h1 className="game-name">RollRich</h1>
 
       <Link to="/" className="logo-desktop" onClick={closeMenu}>
         Accueil

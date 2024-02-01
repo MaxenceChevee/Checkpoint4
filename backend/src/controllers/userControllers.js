@@ -1,8 +1,12 @@
+require("dotenv").config();
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
+const nodemailer = require("nodemailer");
 const tables = require("../tables");
 
+const resetTokenSecret = process.env.RESET_TOKEN_SECRET;
 const secretKey = process.env.APP_SECRET;
 const saltRounds = 10;
 
@@ -40,6 +44,119 @@ const validateUniquePseudoname = async (pseudoname) => {
     throw new Error("Ce pseudo est déjà pris.");
   }
 };
+
+const transporter = nodemailer.createTransport({
+  service: "outlook",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+const generateResetToken = (user) => {
+  const resetToken = jwt.sign({ user: user.id }, resetTokenSecret, {
+    expiresIn: "1h",
+  });
+
+  const base64Token = Buffer.from(resetToken).toString("base64");
+
+  return base64Token;
+};
+
+const sendPasswordResetEmail = async (user, resetToken) => {
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+  const mailOptions = {
+    from: "Cash.Catalyst@outlook.com",
+    to: user.mail,
+    subject: "Réinitialisation de mot de passe",
+    html: `
+      <p>Bonjour ${user.firstname},</p>
+      <p>Vous avez demandé une réinitialisation de mot de passe pour votre compte.</p>
+      <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+      <a href="${resetLink}">Réinitialiser le mot de passe</a>
+      <p>Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer ce message.</p>
+      <p>Merci,</p>
+      <p>Votre équipe ${process.env.APP_NAME || "CashCatalyst"}</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+const forgottenPassword = async (req, res) => {
+  const { mail } = req.body;
+
+  try {
+    const user = await tables.users.getByMail(mail);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    const resetToken = generateResetToken(user);
+
+    await sendPasswordResetEmail(user, resetToken);
+
+    return res.status(200).json({
+      message: "Envoi d'un e-mail de réinitialisation du mot de passe",
+    });
+  } catch (error) {
+    console.error(
+      "Erreur dans l'envoi de l'e-mail de réinitialisation du mot de passe:",
+      error
+    );
+    return res.status(500).json({
+      message:
+        "Erreur dans l'envoi de l'e-mail de réinitialisation du mot de passe",
+    });
+  }
+};
+const resetPassword = async (req, res) => {
+  const { password } = req.body;
+
+  const resetToken = decodeURIComponent(req.params.token);
+
+  try {
+    const decodedToken = jwt.verify(resetToken, resetTokenSecret);
+
+    const user = await tables.users.read(decodedToken.user);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    if (!password) {
+      return res.status(400).json({ message: "Nouveau mot de passe manquant" });
+    }
+
+    const { error } = Joi.string()
+      .min(8)
+      .regex(/[A-Z]/)
+      .message("Le mot de passe doit contenir au moins une majuscule.")
+      .regex(/\d/)
+      .message("Le mot de passe doit contenir au moins un chiffre.")
+      .regex(/[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/)
+      .message("Le mot de passe doit contenir au moins un caractère spécial.")
+      .validate(password);
+
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    await tables.users.edit(user.id, { password: hashedPassword });
+
+    return res
+      .status(200)
+      .json({ message: "Réinitialisation du mot de passe réussie" });
+  } catch (error) {
+    console.error("Erreur de réinitialisation du mot de passe:", error);
+    return res.status(500).json({
+      message: "Erreur de réinitialisation du mot de passe",
+      error,
+    });
+  }
+};
+
 const login = async (req, res) => {
   const { mail, password } = req.body;
 
@@ -280,7 +397,7 @@ const add = async (req, res, next) => {
     res.status(201).json({ insertId, token });
     return insertId;
   } catch (err) {
-    console.error("Error during user registration:", err);
+    console.error("Erreur lors de l'enregistrement de l'utilisateur :", err);
     return next(err);
   }
 };
@@ -318,7 +435,7 @@ const destroy = async (req, res) => {
 
     res.sendStatus(204);
   } catch (err) {
-    console.error("Error during account deletion:", err);
+    console.error("Erreur lors de la suppression du compte :", err);
 
     res.status(500).json({
       errors: {
@@ -354,4 +471,6 @@ module.exports = {
   login,
   updateCredits,
   checkWheelSpin,
+  forgottenPassword,
+  resetPassword,
 };

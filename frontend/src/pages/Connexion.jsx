@@ -111,6 +111,11 @@ const Connexion = () => {
           Inscrivez-vous
         </Link>
       </p>
+      <p>
+        <Link to="/forgot-password" className="forgot-password-link">
+          Forgot your password?
+        </Link>
+      </p>
       {showPopup && (
         <Popup message="Connexion réussie" onClose={handlePopupClose} />
       )}
