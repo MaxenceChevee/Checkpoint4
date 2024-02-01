@@ -3,9 +3,17 @@ import { Link } from "react-router-dom";
 import "../styles/Home.scss";
 
 const Home = () => {
+  const letters = "CashCatalyst";
+
+  const getRandomDelay = () => `${Math.random() * 0.5}s`;
+
   return (
     <>
-      <h1 className="site-name">CashCatalyst</h1>
+      <h1 className="site-name">
+        {letters.split("").map((letter) => (
+          <span key={`${letter}-${getRandomDelay()}`}>{letter}</span>
+        ))}
+      </h1>
 
       <div className="home-container">
         <h2 className="home-title">Bienvenue dans notre casino en ligne</h2>
