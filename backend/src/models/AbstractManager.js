@@ -1,16 +1,43 @@
-// Import database client
 const database = require("../../database/client");
 
-// Provide database access through AbstractManager class
 class AbstractManager {
   constructor({ table }) {
-    // Store the table name
     this.table = table;
 
-    // Provide access to the database client
     this.database = database;
+  }
+
+  async getById(id) {
+    try {
+      const [result] = await this.database.query(
+        "SELECT * FROM ?? WHERE id = ?",
+        [this.table, id]
+      );
+
+      if (result.length === 0) {
+        return null;
+      }
+
+      return result[0];
+    } catch (error) {
+      console.error("Error getting entity by ID:", error);
+      throw error;
+    }
+  }
+
+  async create(data) {
+    try {
+      const [result] = await this.database.query(
+        `INSERT INTO \`${this.table}\` SET ?`,
+        data
+      );
+
+      return result.insertId;
+    } catch (error) {
+      console.error("Error creating entity:", error);
+      throw error;
+    }
   }
 }
 
-// Ready to export
 module.exports = AbstractManager;

@@ -13,13 +13,12 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, secretKey);
-    req.user = decoded;
+    req.user = decoded.user;
     next();
+    return null;
   } catch (error) {
     return res.status(401).json({ message: "Invalid token." });
   }
-
-  return null;
 };
 
 module.exports = verifyToken;

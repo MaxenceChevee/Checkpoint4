@@ -9,3 +9,33 @@ CREATE TABLE users (
   last_wheel_spin TIMESTAMP DEFAULT NULL,
   PRIMARY KEY (id)
 );
+
+CREATE TABLE friend_requests (
+  id INT NOT NULL AUTO_INCREMENT,
+  sender_id INT NOT NULL,
+  receiver_id INT NOT NULL,
+  status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
+  PRIMARY KEY (id),
+  FOREIGN KEY (sender_id) REFERENCES users(id),
+  FOREIGN KEY (receiver_id) REFERENCES users(id)
+);
+
+CREATE TABLE friends (
+  id INT NOT NULL AUTO_INCREMENT,
+  user1_id INT NOT NULL,
+  user2_id INT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (user1_id) REFERENCES users(id),
+  FOREIGN KEY (user2_id) REFERENCES users(id)
+);
+
+CREATE TABLE notifications (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  sender_id INT NOT NULL,
+  type ENUM('friend_request', 'friend_accept') NOT NULL,
+  status ENUM('unread', 'read') DEFAULT 'unread',
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (sender_id) REFERENCES users(id)
+);
