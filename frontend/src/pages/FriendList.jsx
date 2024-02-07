@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import "../styles/FriendList.scss";
 
 const FriendsList = () => {
   const { user } = useContext(AuthContext);
@@ -42,9 +43,9 @@ const FriendsList = () => {
   }, [user]);
 
   return (
-    <div>
+    <div className="friends-list-container">
       <h2>Liste d'amis :</h2>
-      <ul>
+      <ul className="friends-list">
         {friendsList.map((friendGroup, index) => (
           <React.Fragment
             key={`friendGroup-${friendGroup[0]?.groupId || index}`}
@@ -56,8 +57,12 @@ const FriendsList = () => {
                 friend.firstname &&
                 friend.lastname &&
                 friend.pseudoname && (
-                  <li key={`friend-${friend.id}`}>
-                    {friend.firstname} {friend.lastname} ({friend.pseudoname})
+                  <li key={`friend-${friend.id}`} className="friend-item">
+                    <span className="friend-name">
+                      {friend.firstname} {friend.lastname}
+                    </span>{" "}
+                    ({friend.pseudoname}) Ce joueur possède actuellement{" "}
+                    <span className="friend-credits">{friend.credits}$</span>
                   </li>
                 )
             )}
