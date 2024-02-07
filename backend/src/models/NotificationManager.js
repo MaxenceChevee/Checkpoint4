@@ -184,6 +184,18 @@ class NotificationManager extends AbstractManager {
       throw error;
     }
   }
+
+  async deleteAllNotificationsBetweenUsers(userId1, userId2) {
+    try {
+      await this.database.query(
+        "DELETE FROM notifications WHERE (user_id = ? AND sender_id = ?) OR (user_id = ? AND sender_id = ?)",
+        [userId1, userId2, userId2, userId1]
+      );
+    } catch (error) {
+      console.error("Erreur lors de la suppression des notifications :", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new NotificationManager();

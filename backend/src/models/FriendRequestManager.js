@@ -142,6 +142,21 @@ class FriendRequestManager extends AbstractManager {
       throw error;
     }
   }
+
+  async deleteAllFriendRequestsBetweenUsers(userId1, userId2) {
+    try {
+      await this.database.query(
+        "DELETE FROM friend_requests WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)",
+        [userId1, userId2, userId2, userId1]
+      );
+    } catch (error) {
+      console.error(
+        "Erreur lors de la suppression des demandes d'amitié :",
+        error
+      );
+      throw error;
+    }
+  }
 }
 
 module.exports = new FriendRequestManager();

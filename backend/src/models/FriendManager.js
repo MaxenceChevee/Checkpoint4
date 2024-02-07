@@ -12,6 +12,10 @@ class FriendManager extends AbstractManager {
         [userId, userId, userId]
       );
 
+      if (friendsList.length === 0) {
+        return [];
+      }
+
       return friendsList;
     } catch (error) {
       console.error(

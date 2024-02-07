@@ -1,5 +1,6 @@
 const friendManager = require("../models/FriendManager");
 const notificationManager = require("../models/NotificationManager");
+const friendRequestManager = require("../models/FriendRequestManager");
 
 const getFriendsList = async (req, res) => {
   try {
@@ -24,12 +25,10 @@ const addFriend = async (req, res) => {
 
     if (!friendExists) {
       await friendManager.addFriend(userId, friendId);
-
       await notificationManager.deleteFriendRequestNotification(
         userId,
         friendId
       );
-
       res.status(200).json({ message: "Ami ajouté avec succès" });
     } else {
       res.status(400).json({ error: "Cet utilisateur est déjà votre ami" });
@@ -43,12 +42,24 @@ const addFriend = async (req, res) => {
 const unfriend = async (req, res) => {
   try {
     const { friendId } = req.params;
-    const { userId } = req.user;
+    const userId = req.user;
+
     await friendManager.unfriend(userId, friendId);
-    res.status(200).json({ message: "Ami supprimé avec succès" });
+
+    await friendRequestManager.deleteAllFriendRequestsBetweenUsers(
+      userId,
+      friendId
+    );
+
+    await notificationManager.deleteAllNotificationsBetweenUsers(
+      userId,
+      friendId
+    );
+
+    return res.status(200).json({ message: "Ami supprimé avec succès" });
   } catch (error) {
     console.error("Erreur lors de la suppression de l'ami :", error);
-    res.status(500).json({ message: "Erreur interne du serveur" });
+    return res.status(500).json({ error: "Erreur interne du serveur" });
   }
 };
 
