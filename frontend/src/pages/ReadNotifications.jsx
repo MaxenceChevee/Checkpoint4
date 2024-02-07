@@ -65,8 +65,9 @@ const ReadNotifications = () => {
   const handleReject = async (notificationId) => {
     try {
       const jwtToken = localStorage.getItem("token");
-      await axios.delete(
-        `http://localhost:3310/api/notifications/${notificationId}`,
+      await axios.put(
+        `http://localhost:3310/api/friend-requests/${notificationId}/reject`,
+        {},
         {
           headers: {
             "x-auth-token": jwtToken,

@@ -95,12 +95,44 @@ const acceptFriendRequest = async (req, res) => {
 
 const rejectFriendRequest = async (req, res) => {
   try {
-    const { requestId } = req.params;
-    await friendRequestManager.rejectFriendRequest(requestId);
-    res.status(200).json({ message: "Demande d'amitié rejetée avec succès" });
+    const { notificationId } = req.params;
+    const userId = req.user;
+
+    const request = await friendRequestManager.getById(notificationId);
+    if (!request) {
+      console.error("La demande d'amitié n'existe pas.");
+      return res
+        .status(400)
+        .json({ error: "La demande d'amitié n'existe pas." });
+    }
+
+    if (request.status !== "pending") {
+      console.error("La demande d'amitié n'est pas en état 'pending'.");
+      return res
+        .status(400)
+        .json({ error: "La demande d'amitié n'est pas en état 'pending'." });
+    }
+
+    if (Number(request.receiver_id) !== userId) {
+      console.error(
+        "La demande d'amitié n'est pas destinée à cet utilisateur."
+      );
+      return res.status(400).json({
+        error: "La demande d'amitié n'est pas destinée à cet utilisateur.",
+      });
+    }
+
+    await friendRequestManager.rejectFriendRequest(notificationId);
+    await notificationManager.deleteFriendRequestNotification(
+      request.sender_id,
+      request.receiver_id
+    );
+    return res
+      .status(200)
+      .json({ message: "Demande d'amitié rejetée avec succès" });
   } catch (error) {
     console.error("Erreur lors du rejet de la demande d'amitié :", error);
-    res.status(500).json({ message: "Erreur interne du serveur" });
+    return res.status(500).json({ message: "Erreur interne du serveur" });
   }
 };
 

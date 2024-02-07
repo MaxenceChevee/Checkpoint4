@@ -24,7 +24,6 @@ const FriendsList = () => {
               },
             }
           );
-
           setFriendsList(response.data);
         } else {
           console.error(
@@ -46,13 +45,22 @@ const FriendsList = () => {
     <div>
       <h2>Liste d'amis :</h2>
       <ul>
-        {friendsList.map((friendGroup) => (
-          <React.Fragment key={friendGroup[0].id}>
-            {friendGroup.map((friend) => (
-              <li key={friend.id}>
-                {friend.firstname} {friend.lastname} ({friend.pseudoname})
-              </li>
-            ))}
+        {friendsList.map((friendGroup, index) => (
+          <React.Fragment
+            key={`friendGroup-${friendGroup[0]?.groupId || index}`}
+          >
+            {friendGroup.map(
+              (friend) =>
+                friend &&
+                friend.id &&
+                friend.firstname &&
+                friend.lastname &&
+                friend.pseudoname && (
+                  <li key={`friend-${friend.id}`}>
+                    {friend.firstname} {friend.lastname} ({friend.pseudoname})
+                  </li>
+                )
+            )}
           </React.Fragment>
         ))}
       </ul>

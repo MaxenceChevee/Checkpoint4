@@ -92,11 +92,16 @@ class FriendRequestManager extends AbstractManager {
     }
   }
 
-  async rejectFriendRequest(requestId) {
+  async rejectFriendRequest(notificationId) {
     try {
       await this.database.query(
         "UPDATE friend_requests SET status = 'rejected' WHERE id = ?",
-        [requestId]
+        [notificationId]
+      );
+
+      await this.database.query(
+        "DELETE FROM friend_requests WHERE id = ?",
+        notificationId
       );
     } catch (error) {
       console.error("Erreur lors du rejet de la demande d'amitié :", error);
