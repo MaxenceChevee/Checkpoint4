@@ -58,10 +58,10 @@ class NotificationManager extends AbstractManager {
     }
   }
 
-  async createFriendRequestAcceptedNotification(senderId) {
+  async createFriendRequestAcceptedNotification(senderId, receiverId) {
     try {
       const notificationData = {
-        user_id: senderId,
+        user_id: receiverId,
         sender_id: senderId,
         type: "friend_accept",
       };

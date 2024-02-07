@@ -6,6 +6,28 @@ const UnreadNotifications = () => {
   const { user } = useContext(AuthContext);
   const [unreadNotifications, setUnreadNotifications] = useState([]);
 
+  const moveUnreadToRead = async (notificationId) => {
+    try {
+      const jwtToken = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:3310/api/notifications/${notificationId}/mark-as-read`,
+        {},
+        {
+          headers: {
+            "x-auth-token": jwtToken,
+          },
+        }
+      );
+
+      const updatedNotifications = unreadNotifications.filter(
+        (notification) => notification.id !== notificationId
+      );
+      setUnreadNotifications(updatedNotifications);
+    } catch (error) {
+      console.error("Error moving notification to read:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchUnreadNotifications = async () => {
       try {
@@ -31,13 +53,28 @@ const UnreadNotifications = () => {
     };
 
     fetchUnreadNotifications();
-  }, [user]);
+
+    const handleUnload = async () => {
+      unreadNotifications.forEach(async (notification) => {
+        if (!notification.processed) {
+          await moveUnreadToRead(notification.id);
+        }
+      });
+    };
+
+    window.addEventListener("beforeunload", handleUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+  }, [user, unreadNotifications]);
 
   const handleAccept = async (notificationId) => {
     try {
       const jwtToken = localStorage.getItem("token");
+      const userId = user.id;
       await axios.put(
-        `http://localhost:3310/api/notifications/${notificationId}/mark-as-read`,
+        `http://localhost:3310/api/friend-requests/${notificationId}/accept?userId=${userId}`,
         {},
         {
           headers: {
@@ -46,20 +83,21 @@ const UnreadNotifications = () => {
         }
       );
 
-      const updatedNotifications = unreadNotifications.filter(
-        (notification) => notification.id !== notificationId
-      );
-      setUnreadNotifications(updatedNotifications);
+      await moveUnreadToRead(notificationId);
     } catch (error) {
-      console.error("Error accepting friend request:", error);
+      console.error(
+        "Error accepting friend request and moving notification to read:",
+        error
+      );
     }
   };
 
   const handleReject = async (notificationId) => {
     try {
       const jwtToken = localStorage.getItem("token");
-      await axios.delete(
-        `http://localhost:3310/api/notifications/${notificationId}`,
+      await axios.put(
+        `http://localhost:3310/api/friend-requests/${notificationId}/reject`,
+        {},
         {
           headers: {
             "x-auth-token": jwtToken,
@@ -67,12 +105,12 @@ const UnreadNotifications = () => {
         }
       );
 
-      const updatedNotifications = unreadNotifications.filter(
-        (notification) => notification.id !== notificationId
-      );
-      setUnreadNotifications(updatedNotifications);
+      await moveUnreadToRead(notificationId);
     } catch (error) {
-      console.error("Error rejecting friend request:", error);
+      console.error(
+        "Error rejecting friend request and moving notification to read:",
+        error
+      );
     }
   };
 

@@ -45,12 +45,10 @@ const unfriend = async (req, res) => {
     const userId = req.user;
 
     await friendManager.unfriend(userId, friendId);
-
     await friendRequestManager.deleteAllFriendRequestsBetweenUsers(
       userId,
       friendId
     );
-
     await notificationManager.deleteAllNotificationsBetweenUsers(
       userId,
       friendId
