@@ -7,9 +7,9 @@ const AddFriend = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [existingFriendRequest, setExistingFriendRequest] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const senderId = user.id;
 
@@ -27,8 +27,8 @@ const AddFriend = () => {
     }
   };
 
-  const checkExistingFriendRequest = async () => {
-    if (!selectedUser || !selectedUser.id) {
+  const checkExistingFriendRequest = async (userToCheck) => {
+    if (!userToCheck || !userToCheck.id) {
       console.error("ID de l'utilisateur invalide");
       return;
     }
@@ -42,7 +42,7 @@ const AddFriend = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3310/api/friend-requests/${selectedUser.id}`,
+        `http://localhost:3310/api/friend-requests/${userToCheck.id}`,
         {
           headers: {
             "x-auth-token": jwtToken,
@@ -87,8 +87,8 @@ const AddFriend = () => {
   };
 
   useEffect(() => {
-    if (selectedUser) {
-      checkExistingFriendRequest();
+    if (selectedUser && selectedUser.id !== user.id) {
+      checkExistingFriendRequest(selectedUser);
     }
   }, [selectedUser]);
 
@@ -150,37 +150,37 @@ const AddFriend = () => {
         (searchResults.length > 0 ? (
           searchResults.map((searchResult) => (
             <div key={searchResult.id}>
-              <button
-                onClick={() => setSelectedUser(searchResult)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    setSelectedUser(searchResult);
-                  }
-                }}
-                type="button"
-              >
-                {searchResult.pseudoname}
-              </button>
-              {selectedUser && selectedUser.id === searchResult.id && (
-                <div>
-                  <p>Profil de : {selectedUser.pseudoname}</p>
-                  <p>Ce joueur dispose de : {selectedUser.credits}$</p>
-                  {existingFriendRequest ? (
-                    <button type="button" onClick={handleCancelFriendRequest}>
-                      Annuler la demande
-                    </button>
-                  ) : (
-                    <button type="button" onClick={handleAddFriend}>
-                      Ajouter en ami
-                    </button>
-                  )}
-                </div>
+              <p>Profil de : {searchResult.pseudoname}</p>
+              {searchResult.id !== user.id && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedUser(searchResult)}
+                >
+                  Voir le profil
+                </button>
               )}
             </div>
           ))
         ) : (
           <li>Aucun utilisateur trouvé</li>
         ))}
+      {selectedUser && (
+        <div>
+          <p>Profil de : {selectedUser.pseudoname}</p>
+          <p>Ce joueur dispose de : {selectedUser.credits}$</p>
+          {existingFriendRequest && selectedUser.id !== user.id ? (
+            <button type="button" onClick={handleCancelFriendRequest}>
+              Annuler la demande
+            </button>
+          ) : (
+            selectedUser.id !== user.id && (
+              <button type="button" onClick={handleAddFriend}>
+                Ajouter en ami
+              </button>
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 };
