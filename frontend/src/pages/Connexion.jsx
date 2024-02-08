@@ -79,7 +79,7 @@ const Connexion = () => {
       <form ref={formRef} onSubmit={handleSubmit}>
         <div className="connexion-form-label">
           <label>
-            Mail:
+            Email:
             <input
               type="text"
               name="mail"
@@ -102,7 +102,7 @@ const Connexion = () => {
           </label>
         </div>
         <button type="submit" className="connexion-form-button">
-          Se connecter
+          Me connecter
         </button>
       </form>
       <p>
@@ -113,7 +113,7 @@ const Connexion = () => {
       </p>
       <p>
         <Link to="/forgot-password" className="forgot-password-link">
-          Forgot your password?
+          Mot de passe oublié ?
         </Link>
       </p>
       {showPopup && (
