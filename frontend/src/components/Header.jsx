@@ -114,7 +114,7 @@ function Header() {
             <Link to="/settings" className="logo" onClick={closeMenu}>
               Réglages
             </Link>
-            <Link to="/" className="logo" onClick={logout}>
+            <Link to="/" className="logout" onClick={logout}>
               Déconnexion
             </Link>
           </>
