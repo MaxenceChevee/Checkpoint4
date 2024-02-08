@@ -32,6 +32,13 @@ const AddFriend = () => {
     setSearchClicked(true);
     handleSearch();
   };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearchClick();
+    }
+  };
+
   const checkExistingFriendRequest = async (userToCheck) => {
     if (!userToCheck || !userToCheck.id) {
       console.error("ID de l'utilisateur invalide");
@@ -127,13 +134,19 @@ const AddFriend = () => {
     }
   };
 
+  const handleCloseProfile = () => {
+    setSelectedUser(null);
+  };
+
   return (
     <div className="add-friend-container">
+      <h2>Recherchez un utilisateur:</h2>
       <input
         type="text"
         placeholder="Rechercher un utilisateur par pseudonyme"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyPress={handleKeyPress}
         className="add-friend-input"
       />
       <button
@@ -147,7 +160,7 @@ const AddFriend = () => {
       {!loading &&
         (searchResults.length > 0 || !searchClicked ? (
           searchResults.map((searchResult) => (
-            <div key={searchResult.id}>
+            <div key={searchResult.id} className="profile-card">
               <p>Profil de : {searchResult.pseudoname}</p>
               {searchResult.id !== user.id && (
                 <button
@@ -164,8 +177,8 @@ const AddFriend = () => {
           <li>Aucun utilisateur trouvé</li>
         ))}
       {selectedUser && (
-        <div>
-          <p>Profil de : {selectedUser.pseudoname}</p>
+        <div className="profile-card">
+          <p>{selectedUser.pseudoname}</p>
           <p>Ce joueur dispose de : {selectedUser.credits}$</p>
           {existingFriendRequest && selectedUser.id !== user.id ? (
             <button
@@ -186,6 +199,13 @@ const AddFriend = () => {
               </button>
             )
           )}
+          <button
+            type="button"
+            onClick={handleCloseProfile}
+            className="add-friend-button"
+          >
+            Masquer le profil
+          </button>
         </div>
       )}
     </div>

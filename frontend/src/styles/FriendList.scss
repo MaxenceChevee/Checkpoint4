@@ -36,4 +36,80 @@
   .friend-credits {
     color: #ffa500;
   }
+
+  .friend-item button {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin: 0 10px;
+    font-size: 14px;
+    background-color: #97202c !important;
+    color: #fff;
+  }
+
+  .friend-item button:hover {
+    background-color: #771d27 !important;
+  }
+  .modal-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    .modal-background {
+      z-index: 1;
+      background-color: rgba(0, 0, 0, 0.8);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .modal-content {
+      z-index: 2;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      border-radius: 20px;
+      color: black;
+      padding: 20px;
+      width: fit-content;
+      position: fixed;
+      pointer-events: auto;
+    }
+  }
+  .modal-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .button-yes,
+  .button-no {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin: 0 10px;
+    font-size: 14px;
+  }
+
+  .button-yes {
+    background-color: #1551c2 !important;
+    color: #fff;
+  }
+
+  .button-no {
+    background-color: #97202c !important;
+    color: #fff;
+  }
+}
+.add-friend-link {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
 }
