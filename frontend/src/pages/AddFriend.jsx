@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import "../styles/AddFriend.scss";
 
 const AddFriend = () => {
   const { user } = useAuth();
-
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [existingFriendRequest, setExistingFriendRequest] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [searchClicked, setSearchClicked] = useState(false);
 
   const senderId = user.id;
 
@@ -27,19 +28,20 @@ const AddFriend = () => {
     }
   };
 
+  const handleSearchClick = () => {
+    setSearchClicked(true);
+    handleSearch();
+  };
   const checkExistingFriendRequest = async (userToCheck) => {
     if (!userToCheck || !userToCheck.id) {
       console.error("ID de l'utilisateur invalide");
       return;
     }
-
     const jwtToken = localStorage.getItem("token");
-
     if (!jwtToken) {
       console.error("Access denied. No token provided.");
       return;
     }
-
     try {
       const response = await axios.get(
         `http://localhost:3310/api/friend-requests/${userToCheck.id}`,
@@ -49,7 +51,6 @@ const AddFriend = () => {
           },
         }
       );
-
       setExistingFriendRequest(
         response.data.length > 0 ? response.data[0] : null
       );
@@ -67,10 +68,8 @@ const AddFriend = () => {
         console.error("La demande d'ami à annuler n'est pas valide.");
         return;
       }
-
       const jwtToken = localStorage.getItem("token");
       const requestId = existingFriendRequest.id;
-
       await axios.delete(
         `http://localhost:3310/api/friend-requests/${requestId}/cancel`,
         {
@@ -79,7 +78,6 @@ const AddFriend = () => {
           },
         }
       );
-
       setExistingFriendRequest(null);
     } catch (error) {
       console.error("Erreur lors de l'annulation de la demande d'ami:", error);
@@ -98,21 +96,17 @@ const AddFriend = () => {
         console.error("ID de l'utilisateur invalide");
         return;
       }
-
       const jwtToken = localStorage.getItem("token");
-
       if (!jwtToken) {
         console.error("Access denied. No token provided.");
         return;
       }
-
       if (existingFriendRequest) {
         console.error(
           "Une demande d'amitié existe déjà entre ces deux utilisateurs."
         );
         return;
       }
-
       const response = await axios.post(
         `http://localhost:3310/api/friend-requests/${selectedUser.id}`,
         null,
@@ -122,7 +116,6 @@ const AddFriend = () => {
           },
         }
       );
-
       setExistingFriendRequest({
         id: response.data.requestId,
         sender_id: senderId,
@@ -135,19 +128,24 @@ const AddFriend = () => {
   };
 
   return (
-    <div>
+    <div className="add-friend-container">
       <input
         type="text"
         placeholder="Rechercher un utilisateur par pseudonyme"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
+        className="add-friend-input"
       />
-      <button type="button" onClick={handleSearch}>
+      <button
+        type="button"
+        onClick={handleSearchClick}
+        className="add-friend-button"
+      >
         Rechercher
       </button>
       {loading && <li>Chargement...</li>}
       {!loading &&
-        (searchResults.length > 0 ? (
+        (searchResults.length > 0 || !searchClicked ? (
           searchResults.map((searchResult) => (
             <div key={searchResult.id}>
               <p>Profil de : {searchResult.pseudoname}</p>
@@ -155,6 +153,7 @@ const AddFriend = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedUser(searchResult)}
+                  className="add-friend-button"
                 >
                   Voir le profil
                 </button>
@@ -169,12 +168,20 @@ const AddFriend = () => {
           <p>Profil de : {selectedUser.pseudoname}</p>
           <p>Ce joueur dispose de : {selectedUser.credits}$</p>
           {existingFriendRequest && selectedUser.id !== user.id ? (
-            <button type="button" onClick={handleCancelFriendRequest}>
+            <button
+              type="button"
+              onClick={handleCancelFriendRequest}
+              className="add-friend-button"
+            >
               Annuler la demande
             </button>
           ) : (
             selectedUser.id !== user.id && (
-              <button type="button" onClick={handleAddFriend}>
+              <button
+                type="button"
+                onClick={handleAddFriend}
+                className="add-friend-button"
+              >
                 Ajouter en ami
               </button>
             )
