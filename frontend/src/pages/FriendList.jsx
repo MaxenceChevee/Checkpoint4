@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import "../styles/FriendList.scss";
+import SendGift from "../components/SendGift";
 
 const FriendsList = () => {
   const { user } = useContext(AuthContext);
@@ -87,6 +88,7 @@ const FriendsList = () => {
     setShowDeletePopup(false);
     setFriendToDeleteId(null);
   };
+
   return (
     <div className="friends-list-container">
       <h2>Liste d'amis :</h2>
@@ -122,6 +124,7 @@ const FriendsList = () => {
                     >
                       Supprimer
                     </button>
+                    <SendGift senderId={user.id} receiverId={friend.id} />
                   </li>
                 ) : null
               )}

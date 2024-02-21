@@ -29,11 +29,23 @@ CREATE TABLE friends (
   FOREIGN KEY (user2_id) REFERENCES users(id)
 );
 
+CREATE TABLE gift_transactions (
+  id INT NOT NULL AUTO_INCREMENT,
+  sender_id INT NOT NULL,
+  receiver_id INT NOT NULL,
+  credits_amount INT NOT NULL,
+  transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE (sender_id, receiver_id, transaction_date),
+  FOREIGN KEY (sender_id) REFERENCES users(id),
+  FOREIGN KEY (receiver_id) REFERENCES users(id)
+);
+
 CREATE TABLE notifications (
   id INT NOT NULL AUTO_INCREMENT,
   user_id INT NOT NULL,
   sender_id INT NOT NULL,
-  type ENUM('friend_request', 'friend_accept') NOT NULL,
+  type ENUM('friend_request', 'friend_accept', 'gift') NOT NULL,
   status ENUM('unread', 'read') DEFAULT 'unread',
   PRIMARY KEY (id),
   FOREIGN KEY (user_id) REFERENCES users(id),

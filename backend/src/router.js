@@ -8,6 +8,7 @@ const friendRequestControllers = require("./controllers/friendRequestControllers
 const notificationControllers = require("./controllers/notificationControllers");
 const unreadNotificationController = require("./controllers/unreadNotificationController");
 const readNotificationController = require("./controllers/readNotificationController");
+const giftControllers = require("./controllers/giftControllers");
 
 router.post("/login", userControllers.login);
 
@@ -87,5 +88,6 @@ router.get(
   verifyToken,
   readNotificationController.getReadNotificationsByUserId
 );
-
+// Nouvelle route pour l'envoi de cadeaux
+router.post("/send-gift", verifyToken, giftControllers.sendGift);
 module.exports = router;
