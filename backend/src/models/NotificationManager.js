@@ -8,12 +8,14 @@ class NotificationManager extends AbstractManager {
 
   async createGiftNotification(senderId, receiverId, creditsAmount) {
     try {
+      const roundedCreditsAmount = Math.ceil(creditsAmount / 10) * 10;
+
       const notificationData = {
         user_id: receiverId,
         sender_id: senderId,
         type: "gift",
-        content: `Vous avez reçu un cadeau de ${senderId} : ${creditsAmount} crédits.`,
-        credits_amount: creditsAmount,
+        content: `Vous avez reçu un cadeau de ${senderId} : ${roundedCreditsAmount} crédits.`,
+        credits_amount: roundedCreditsAmount,
       };
       await this.create(notificationData);
     } catch (error) {
