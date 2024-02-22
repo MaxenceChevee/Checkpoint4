@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 const nodemailer = require("nodemailer");
+const friendRequestManager = require("../models/FriendRequestManager");
 const tables = require("../tables");
 
 const resetTokenSecret = process.env.RESET_TOKEN_SECRET;
@@ -461,6 +462,36 @@ const checkWheelSpin = async (req, res) => {
     });
   }
 };
+const findUserByPseudoname = async (req, res) => {
+  try {
+    const { pseudoname } = req.params;
+    const loggedInUserId = req.user ? req.user.user : undefined;
+
+    const user = await tables.users.getByPseudoname(pseudoname);
+
+    if (user) {
+      if (loggedInUserId) {
+        const existingRequest =
+          await friendRequestManager.checkExistingFriendRequest(
+            loggedInUserId,
+            user.id
+          );
+
+        user.hasExistingFriendRequest = existingRequest;
+      }
+
+      return res.status(200).json({ user });
+    }
+
+    return res.status(404).json({ message: "Utilisateur non trouvé" });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la recherche de l'utilisateur par pseudonyme :",
+      error
+    );
+    return res.status(500).json({ message: "Erreur interne du serveur" });
+  }
+};
 
 module.exports = {
   browse,
@@ -473,4 +504,5 @@ module.exports = {
   checkWheelSpin,
   forgottenPassword,
   resetPassword,
+  findUserByPseudoname,
 };

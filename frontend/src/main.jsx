@@ -20,6 +20,10 @@ import Settings from "./pages/Settings";
 import Wheelset from "./pages/Wheelset";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AddFriend from "./pages/AddFriend";
+import UnreadNotifications from "./pages/UnreadNotifications";
+import ReadNotifications from "./pages/ReadNotifications";
+import FriendList from "./pages/FriendList";
 
 const PrivateRoute = ({ element }) => {
   const { user } = useAuth();
@@ -76,6 +80,22 @@ const Main = () => {
         <Route
           path="settings"
           element={<PrivateRoute element={<Settings />} />}
+        />
+        <Route
+          path="add-friend"
+          element={<PrivateRoute element={<AddFriend />} />}
+        />
+        <Route
+          path="unread-notifications"
+          element={<PrivateRoute element={<UnreadNotifications />} />}
+        />
+        <Route
+          path="read-notifications"
+          element={<PrivateRoute element={<ReadNotifications />} />}
+        />
+        <Route
+          path="friend-list"
+          element={<PrivateRoute element={<FriendList />} />}
         />
       </Route>
     </Routes>
