@@ -6,7 +6,24 @@ const UnreadNotifications = () => {
   const { user } = useContext(AuthContext);
   const [unreadNotifications, setUnreadNotifications] = useState([]);
 
-  const moveUnreadToRead = async (notificationId) => {
+  const markAsRead = async (notificationId) => {
+    try {
+      const jwtToken = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:3310/api/notifications/${notificationId}/mark-as-read`,
+        {},
+        {
+          headers: {
+            "x-auth-token": jwtToken,
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
+  const moveToReadNotifications = async (notificationId) => {
     try {
       const jwtToken = localStorage.getItem("token");
       await axios.put(
@@ -25,6 +42,55 @@ const UnreadNotifications = () => {
       setUnreadNotifications(updatedNotifications);
     } catch (error) {
       console.error("Error moving notification to read:", error);
+    }
+  };
+
+  const handleNotificationClick = async (notificationId) => {
+    await markAsRead(notificationId);
+    await moveToReadNotifications(notificationId);
+  };
+
+  const handleAccept = async (notificationId) => {
+    try {
+      const jwtToken = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:3310/api/friend-requests/${notificationId}/accept?userId=${user.id}`,
+        {},
+        {
+          headers: {
+            "x-auth-token": jwtToken,
+          },
+        }
+      );
+
+      const updatedNotifications = unreadNotifications.filter(
+        (notification) => notification.id !== notificationId
+      );
+      setUnreadNotifications(updatedNotifications);
+    } catch (error) {
+      console.error("Error accepting friend request:", error);
+    }
+  };
+
+  const handleReject = async (notificationId) => {
+    try {
+      const jwtToken = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:3310/api/friend-requests/${notificationId}/reject`,
+        {},
+        {
+          headers: {
+            "x-auth-token": jwtToken,
+          },
+        }
+      );
+
+      const updatedNotifications = unreadNotifications.filter(
+        (notification) => notification.id !== notificationId
+      );
+      setUnreadNotifications(updatedNotifications);
+    } catch (error) {
+      console.error("Error rejecting friend request:", error);
     }
   };
 
@@ -57,7 +123,7 @@ const UnreadNotifications = () => {
     const handleUnload = async () => {
       unreadNotifications.forEach(async (notification) => {
         if (!notification.processed) {
-          await moveUnreadToRead(notification.id);
+          await moveToReadNotifications(notification.id);
         }
       });
     };
@@ -69,75 +135,54 @@ const UnreadNotifications = () => {
     };
   }, [user, unreadNotifications]);
 
-  const handleAccept = async (notificationId) => {
-    try {
-      const jwtToken = localStorage.getItem("token");
-      const userId = user.id;
-      await axios.put(
-        `http://localhost:3310/api/friend-requests/${notificationId}/accept?userId=${userId}`,
-        {},
-        {
-          headers: {
-            "x-auth-token": jwtToken,
-          },
-        }
-      );
-
-      await moveUnreadToRead(notificationId);
-    } catch (error) {
-      console.error(
-        "Error accepting friend request and moving notification to read:",
-        error
-      );
-    }
-  };
-
-  const handleReject = async (notificationId) => {
-    try {
-      const jwtToken = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:3310/api/friend-requests/${notificationId}/reject`,
-        {},
-        {
-          headers: {
-            "x-auth-token": jwtToken,
-          },
-        }
-      );
-
-      await moveUnreadToRead(notificationId);
-    } catch (error) {
-      console.error(
-        "Error rejecting friend request and moving notification to read:",
-        error
-      );
-    }
-  };
-
   return (
     <div>
       <h2>Notifications non lues :</h2>
       <ul>
         {unreadNotifications.map((notification) => (
           <li key={notification.id}>
-            {notification.content}
-            {notification.type === "friend_request" && (
-              <div>
-                {`Demande d'ami de ${notification.sender_pseudoname}`}
-                <button
-                  type="button"
-                  onClick={() => handleAccept(notification.id)}
-                >
-                  Accepter
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleReject(notification.id)}
-                >
-                  Rejeter
-                </button>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={() => handleNotificationClick(notification.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleNotificationClick(notification.id);
+                }
+              }}
+              tabIndex={0}
+              style={{ cursor: "pointer" }}
+            >
+              {notification.content}
+              {notification.type === "gift" && (
+                <p>{`${notification.sender_pseudoname} vous a envoyé un cadeau : ${notification.credits_amount} crédits.`}</p>
+              )}
+              {notification.type === "friend_request" && (
+                <div>
+                  {`Demande d'ami de ${notification.sender_pseudoname}`}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAccept(notification.id);
+                    }}
+                  >
+                    Accepter
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReject(notification.id);
+                    }}
+                  >
+                    Rejeter
+                  </button>
+                </div>
+              )}
+              {notification.type === "friend_accept" && (
+                <p>{`${notification.sender_pseudoname} a accepté votre demande d'ami`}</p>
+              )}
+            </button>
           </li>
         ))}
       </ul>

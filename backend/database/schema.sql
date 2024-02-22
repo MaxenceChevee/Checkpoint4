@@ -47,7 +47,11 @@ CREATE TABLE notifications (
   sender_id INT NOT NULL,
   type ENUM('friend_request', 'friend_accept', 'gift') NOT NULL,
   status ENUM('unread', 'read') DEFAULT 'unread',
+  content VARCHAR(255),
+  credits_amount INT,
   PRIMARY KEY (id),
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (sender_id) REFERENCES users(id)
 );
+
+

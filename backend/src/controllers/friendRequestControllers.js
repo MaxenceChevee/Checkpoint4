@@ -74,10 +74,7 @@ const acceptFriendRequest = async (req, res) => {
       userId
     );
 
-    await notificationManager.createFriendRequestAcceptedNotification(
-      senderId,
-      userId
-    );
+    await notificationManager.sendFriendAcceptNotification(senderId, userId);
 
     await friendManager.addFriend(senderId, userId);
 

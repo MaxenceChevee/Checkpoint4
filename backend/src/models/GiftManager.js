@@ -1,5 +1,6 @@
 const AbstractManager = require("./AbstractManager");
 const UserManager = require("./UserManager");
+const NotificationManager = require("./NotificationManager");
 
 class GiftManager extends AbstractManager {
   constructor() {
@@ -40,14 +41,23 @@ class GiftManager extends AbstractManager {
 
       await this.incrementUserCredits(receiverId, roundedAmount);
 
+      await NotificationManager.createGiftNotification(
+        senderId,
+        receiverId,
+        creditsAmount
+      );
+
       await this.create({
         sender_id: senderId,
         receiver_id: receiverId,
-        credits_amount: roundedAmount,
+        credits_amount: creditsAmount,
         transaction_date: new Date(),
       });
     } catch (error) {
-      console.error("Error creating gift transaction:", error);
+      console.error(
+        "Erreur lors de la création de la transaction de cadeau :",
+        error
+      );
       throw error;
     }
   }

@@ -6,6 +6,25 @@ class NotificationManager extends AbstractManager {
     super({ table: "notifications" });
   }
 
+  async createGiftNotification(senderId, receiverId, creditsAmount) {
+    try {
+      const notificationData = {
+        user_id: receiverId,
+        sender_id: senderId,
+        type: "gift",
+        content: `Vous avez reçu un cadeau de ${senderId} : ${creditsAmount} crédits.`,
+        credits_amount: creditsAmount,
+      };
+      await this.create(notificationData);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la création de la notification pour le cadeau :",
+        error
+      );
+      throw error;
+    }
+  }
+
   async createFriendRequestNotification(senderId, receiverId) {
     try {
       const notificationData = {
@@ -26,7 +45,6 @@ class NotificationManager extends AbstractManager {
   async handleFriendRequestAccept(notificationId, userId) {
     try {
       const notification = await this.getById(notificationId);
-
       if (
         !notification ||
         notification.type !== "friend_request" ||
@@ -36,18 +54,19 @@ class NotificationManager extends AbstractManager {
           "La notification n'existe pas ou n'est pas destinée à cet utilisateur."
         );
       }
-
       const newFriendId = await friendRequestManager.acceptFriendRequest(
         notification.sender_id,
         notification.user_id
       );
-
-      await this.createFriendRequestAcceptedNotification(
+      await this.markAsRead(notificationId);
+      await this.sendFriendAcceptNotification(
         notification.sender_id,
         notification.user_id
       );
-
-      await this.markAsRead(notificationId);
+      await this.deleteFriendRequestNotification(
+        notification.sender_id,
+        notification.user_id
+      );
       return newFriendId;
     } catch (error) {
       console.error(
@@ -58,17 +77,18 @@ class NotificationManager extends AbstractManager {
     }
   }
 
-  async createFriendRequestAcceptedNotification(senderId, receiverId) {
+  async sendFriendAcceptNotification(senderId, receiverId) {
     try {
       const notificationData = {
-        user_id: receiverId,
-        sender_id: senderId,
+        user_id: senderId,
+        sender_id: receiverId,
         type: "friend_accept",
+        content: `Votre demande d'ami a été acceptée par l'utilisateur avec l'ID ${senderId}.`,
       };
       await this.create(notificationData);
     } catch (error) {
       console.error(
-        "Erreur lors de la création de la notification d'acceptation de la demande d'amitié :",
+        "Erreur lors de la création et de l'envoi de la notification d'acceptation d'ami :",
         error
       );
       throw error;
@@ -94,7 +114,7 @@ class NotificationManager extends AbstractManager {
   async getUnreadByUserId(userId) {
     try {
       const [rawNotifications] = await this.database.query(
-        "SELECT n.*, u.pseudoname as sender_pseudoname FROM notifications n JOIN users u ON n.sender_id = u.id WHERE n.user_id = ? AND n.status = 'unread'",
+        "SELECT n.*, u.pseudoname as sender_pseudoname, n.credits_amount FROM notifications n JOIN users u ON n.sender_id = u.id WHERE n.user_id = ? AND n.status = 'unread'",
         [userId]
       );
       const notifications = rawNotifications.map((notification) => ({
@@ -104,6 +124,7 @@ class NotificationManager extends AbstractManager {
         sender_pseudoname: notification.sender_pseudoname,
         type: notification.type,
         status: notification.status,
+        credits_amount: notification.credits_amount,
       }));
       return notifications;
     } catch (error) {
@@ -115,7 +136,7 @@ class NotificationManager extends AbstractManager {
   async getReadByUserId(userId) {
     try {
       const [rawNotifications] = await this.database.query(
-        "SELECT n.*, u.pseudoname as sender_pseudoname FROM notifications n JOIN users u ON n.sender_id = u.id WHERE n.user_id = ? AND n.status = 'read'",
+        "SELECT n.*, u.pseudoname as sender_pseudoname, n.credits_amount FROM notifications n JOIN users u ON n.sender_id = u.id WHERE n.user_id = ? AND n.status = 'read'",
         [userId]
       );
       const notifications = rawNotifications.map((notification) => ({
@@ -125,6 +146,7 @@ class NotificationManager extends AbstractManager {
         sender_pseudoname: notification.sender_pseudoname,
         type: notification.type,
         status: notification.status,
+        credits_amount: notification.credits_amount,
       }));
       return notifications;
     } catch (error) {

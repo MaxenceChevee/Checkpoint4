@@ -7,7 +7,7 @@ const ReadNotifications = () => {
   const [readNotifications, setReadNotifications] = useState([]);
 
   useEffect(() => {
-    const fetchReadNotifications = async () => {
+    const fetchNotifications = async () => {
       try {
         if (!user) {
           return;
@@ -33,10 +33,10 @@ const ReadNotifications = () => {
       }
     };
 
-    fetchReadNotifications();
+    fetchNotifications();
   }, [user]);
 
-  const handleAccept = async (notificationId) => {
+  const handleAcceptFriendRequest = async (notificationId) => {
     try {
       const jwtToken = localStorage.getItem("token");
       const userId = user.id;
@@ -62,7 +62,7 @@ const ReadNotifications = () => {
     }
   };
 
-  const handleReject = async (notificationId) => {
+  const handleRejectFriendRequest = async (notificationId) => {
     try {
       const jwtToken = localStorage.getItem("token");
       await axios.put(
@@ -88,32 +88,35 @@ const ReadNotifications = () => {
     <div>
       <h2>Notifications lues :</h2>
       <ul>
-        {readNotifications.map((notification) => (
-          <li key={notification.id}>
-            {notification.content}
-            {notification.type === "friend_request" && (
-              <div>
-                {!notification.processed && (
-                  <>
-                    <p>{`${notification.sender_pseudoname} vous a envoyé une demande d'ami`}</p>
-                    <button
-                      type="button"
-                      onClick={() => handleAccept(notification.id)}
-                    >
-                      Accepter
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleReject(notification.id)}
-                    >
-                      Rejeter
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-          </li>
-        ))}
+        {readNotifications &&
+          readNotifications.map((notification) => (
+            <li key={notification.id}>
+              {notification.content}
+              {notification.type === "gift" && (
+                <p>{`${notification.sender_pseudoname} vous a envoyé un cadeau : ${notification.credits_amount} crédits.`}</p>
+              )}
+              {notification.type === "friend_request" && (
+                <div>
+                  <p>{`${notification.sender_pseudoname} vous a envoyé une demande d'ami`}</p>
+                  <button
+                    type="button"
+                    onClick={() => handleAcceptFriendRequest(notification.id)}
+                  >
+                    Accepter
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRejectFriendRequest(notification.id)}
+                  >
+                    Rejeter
+                  </button>
+                </div>
+              )}
+              {notification.type === "friend_accept" && (
+                <p>{`${notification.sender_pseudoname} a accepté votre demande d'ami`}</p>
+              )}
+            </li>
+          ))}
       </ul>
     </div>
   );
